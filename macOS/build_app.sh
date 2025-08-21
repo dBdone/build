@@ -13,7 +13,7 @@ PUBSPEC_YAML=pubspec.yaml
 FAKE_VERSION=9.9.9+99
 VERSION_HEADER_FILE=$NATIVE_ROOT/plugins/dbdone/Source/version.h
 INSTALLER_DIR=./installer
-
+ARCHIVE=./archive
 
 # ───────────────────────────────────────────────────────────────
 # Helper: show a 3-item menu and set $sel to 1,2 or 3
@@ -84,6 +84,7 @@ elif (( sel == 2 )); then
   useCurrentCommit=false
   doDeploy=true
 fi
+
 
 # ───────────────────────────────────────────────────────────────
 # 3) Determine version / checkout
@@ -169,5 +170,12 @@ cd $INSTALLER_DIR
 ./build_app_installer.sh $version
 popd
 
-echo Deploying installer...
-./deploy_app.sh
+if $doDeploy then
+  echo Deploying installer...
+  ./deploy_app.sh
+fi
+
+echo Archiving Symbols...
+ditto -c -k --keepParent $SYMBOLS $ARCHIVE/dSYMs_$version.zip
+rm -rf $SYMBOLS/*
+
