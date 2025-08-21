@@ -173,9 +173,9 @@ cd $INSTALLER_DIR
 ./build_app_installer.sh $version
 popd
 
-if $doDeploy then
+if $doDeploy; then
   echo Deploying installer...
-  ./deploy_app.sh
+  ./deploy_app.sh $version
 fi
 
 echo Archiving Symbols...

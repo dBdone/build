@@ -8,7 +8,7 @@ echo +++++++++++++++++++++++++++++++
 echo
 
 BUILD_DATA=./build_data
-NATIVE_ROOT=../native
+NATIVE_ROOT=../../native
 
 xcodebuild -quiet \
   -project $NATIVE_ROOT/components/dbDoneBackend/Builds/MacOSX/dbDoneBackend.xcodeproj \
