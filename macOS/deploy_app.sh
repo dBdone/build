@@ -34,6 +34,7 @@ curl -s -X POST \
   -H "apikey: $SECRET_SUPABASE_SERVICE_ROLE_KEY" \
   -H "Authorization: Bearer $SECRET_SUPABASE_SERVICE_ROLE_KEY" \
   -H "Content-Type: application/octet-stream" \
+  -H "x-upsert: true" \
   --data-binary @"$INSTALLER_FILE" \
   "$REMOTE_INSTALLER_URL" \
   || { echo "Upload failed"; exit 1; }

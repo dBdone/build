@@ -111,6 +111,9 @@ fi
 echo REMOVING existing AAX plugin...
 sudo rm -rf /Library/Application\ Support/Avid/Audio/Plug-Ins/dbdone.aaxplugin
 
+echo building dBdone backend library...
+./build_backend_lib.sh
+
 echo +++++++++++++++++++++++++++++++
 echo building app...
 echo +++++++++++++++++++++++++++++++
