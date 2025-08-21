@@ -8,6 +8,15 @@ else
 fi
 
 
+# -- Ensure pandoc is available --
+if ! command -v pandoc >/dev/null; then
+  echo "Error: pandoc is required (brew install pandoc)." >&2
+  exit 1
+fi
+
+echo crafting terms-of-service...
+pandoc -s -f gfm -t html5 --embed-resources --standalone -o resources/terms-of-service.html ../../terms.md
+
 # for signing:
 source ./prepare_signing.sh
 
