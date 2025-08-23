@@ -75,7 +75,7 @@ else
     -H "Content-Type: application/json" \
     -H "Content-Profile: shop" \
     -d "$payload" \
-    "$PUBLIC_SUPABASE_URL/rest/v1/installers?version_string=eq.$VERSION" \
+    "$PUBLIC_SUPABASE_URL/rest/v1/installers?version=eq.$VERSION" \
     || { echo "Update failed"; exit 1; }
   echo "Updated release $VERSION."
 fi
