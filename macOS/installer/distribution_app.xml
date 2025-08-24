@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
-    <title>dBdone Version 1.3.0-6</title>
+    <title>dBdone Version 1.3.0-9</title>
     <license file="terms-of-service.html"/>
 
     <pkg-ref id="com.dbdone.app.pkg" version="0" onConclusion="none">dBdoneAPP.pkg</pkg-ref>

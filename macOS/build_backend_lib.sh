@@ -12,12 +12,12 @@ NATIVE_ROOT=../../native
 
 xcodebuild -quiet \
   -project $NATIVE_ROOT/components/dbDoneBackend/Builds/MacOSX/dbDoneBackend.xcodeproj \
-  -scheme "dbDoneBackend - Static Library" \
+  -scheme "dBdoneBackend - Dynamic Library" \
   -configuration Release \
   -destination "generic/platform=macOS" \
   -derivedDataPath build_data \
   clean build
 
-cp $NATIVE_ROOT/components/dbDoneBackend/Builds/MacOSX/build/Release/libdbDoneBackend.a \
+cp $NATIVE_ROOT/components/dbDoneBackend/Builds/MacOSX/build/Release/dbdone_backend.dylib \
   $NATIVE_ROOT/components/dbDoneBackend/Lib
 
