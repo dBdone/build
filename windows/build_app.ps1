@@ -112,6 +112,8 @@ catch {
 & flutter build windows
 Pop-Location
 
+Write-Host "Copying dbdone_backend.dll..."
+Copy-Item "$NATIVE_ROOT\components\dbDoneBackend\lib\Release\dbdone_backend.dll" "$NATIVE_ROOT\app\build\windows\x64\runner\Release"
 
 Write-Host ("+" * 30)
 Write-Host "Building dBdone plugin..."
