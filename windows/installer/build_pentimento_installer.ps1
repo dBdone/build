@@ -10,7 +10,7 @@ param(
   [string]$Version
 )
 
-$INSTALLER_FILE = ".\dbdone.iss"
+$INSTALLER_FILE = ".\pentimento.iss"
 $ISCC = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 $SIGNTOOL = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\signtool.exe"
 $OUTPUT_DIR = ".\output"  
@@ -54,5 +54,5 @@ Write-Host 'Signing installer...'
   /tr http://ts.ssl.com `
   /td sha256 `
   /sha1 6B428DAFA4A8C9BD4027CE8EE87E035C7DE09B5F `
-  "$OUTPUT_DIR\dBdone Installer.exe"
+  "$OUTPUT_DIR\Pentimento Installer.exe"
 
