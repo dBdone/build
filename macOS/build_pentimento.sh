@@ -131,6 +131,15 @@ fi
 ./build_pentimento_plugin_au.sh
 ./build_pentimento_plugin_aax.sh
 
+PACKS_ROOT_PENTIMENTO=./installer/packs_root_pentimento 
+PACKS_DEST_PENTIMENTO="$PACKS_ROOT_PENTIMENTO/Library/Application Support/com.dbdone.pentimento/"
+
+rm -rf $PACKS_ROOT_PENTIMENTO/*
+mkdir -p $PACKS_DEST_PENTIMENTO
+
+echo copying packs...
+cp -R ../common/pentimento/packs $PACKS_DEST_PENTIMENTO
+
 pushd .
 cd $INSTALLER_DIR 
 ./build_pentimento_installer.sh $version

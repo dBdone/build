@@ -37,6 +37,10 @@ sed -i '' -E \
 
 echo "Patched installer file $dist_file"
 
+pkgbuild --identifier com.dbdone.pentimentopacks.pkg \
+    --sign "Developer ID Installer: Wolfgang Schneider (3ZW8CQVDYJ)" \
+    --root ./packs_root_pentimento "pentimentoPACKS.pkg" 
+
 pkgbuild --identifier com.dbdone.pentimentovst.pkg \
     --sign "Developer ID Installer: Wolfgang Schneider (3ZW8CQVDYJ)" \
     --root ./vst_root_pentimento "pentimentoVST.pkg" 
@@ -61,5 +65,6 @@ mv "Pentimento Installer.pkg" $OUTPUT_DIR
 rm pentimentoVST.pkg
 rm pentimentoAU.pkg
 rm pentimentoAAX.pkg
+rm pentimentoPACKS.pkg
 
 

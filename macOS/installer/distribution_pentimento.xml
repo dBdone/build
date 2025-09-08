@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
-    <title>Pentimento Version 9.9.9+99</title>
+    <title>Pentimento Version 0.9.0-6</title>
     <license file="terms-of-service.html"/>
 
     <pkg-ref id="com.dbdone.pentimentovst.pkg" version="0" onConclusion="none">pentimentoVST.pkg</pkg-ref>
     <pkg-ref id="com.dbdone.pentimentoau.pkg" version="0" onConclusion="none">pentimentoAU.pkg</pkg-ref>
     <pkg-ref id="com.dbdone.pentimentoaax.pkg" version="0" onConclusion="none">pentimentoAAX.pkg</pkg-ref>
 
+    <pkg-ref id="com.dbdone.pentimentopacks.pkg" version="0" onConclusion="none">pentimentoPACKS.pkg</pkg-ref>
+
     <options customize="always" require-scripts="false" hostArchitectures="x86_64,arm64"/>
     <choices-outline>
-            <line choice="pentimentovst"/>
-            <line choice="pentimentoau"/>
-            <line choice="pentimentoaax"/>
+        <line choice="pentimentopacks"/>
+        <line choice="pentimentovst"/>
+        <line choice="pentimentoau"/>
+        <line choice="pentimentoaax"/>
     </choices-outline>
+
+    <choice id="pentimentopacks"
+        title="Sample Packs (required)"
+        selected="true"
+        enabled="false"
+        visible="true">
+        <pkg-ref id="com.dbdone.pentimentopacks.pkg"/>
+    </choice>
+
     <choice id="pentimentovst" title="Pentimento Plugin (VST3)" visible="true">
         <pkg-ref id="com.dbdone.pentimentovst.pkg"/>
     </choice>
