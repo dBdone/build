@@ -140,6 +140,17 @@ mkdir -p $PACKS_DEST_PENTIMENTO
 echo copying packs...
 cp -R ../common/pentimento/packs $PACKS_DEST_PENTIMENTO
 
+BASIC_ROOT_PENTIMENTO=./installer/basic_root_pentimento 
+BASIC_DEST_PENTIMENTO="$BASIC_ROOT_PENTIMENTO/Library/Application Support/com.dbdone.pentimento/"
+
+rm -rf $BASIC_ROOT_PENTIMENTO/*
+mkdir -p $BASIC_DEST_PENTIMENTO
+
+echo copying basic...
+cp ../../native/components/dbDoneBackend/Lib/dbdone_backend.dylib $BASIC_DEST_PENTIMENTO
+
+
+
 pushd .
 cd $INSTALLER_DIR 
 ./build_pentimento_installer.sh $version
