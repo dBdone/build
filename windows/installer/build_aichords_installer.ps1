@@ -54,5 +54,5 @@ Write-Host 'Signing installer...'
   /tr http://ts.ssl.com `
   /td sha256 `
   /sha1 6B428DAFA4A8C9BD4027CE8EE87E035C7DE09B5F `
-  "$OUTPUT_DIR\AIChords Installer.exe"
+  "$OUTPUT_DIR\AI Chords Installer.exe"
 

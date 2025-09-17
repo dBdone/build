@@ -7,8 +7,8 @@
 ArchitecturesInstallIn64BitMode=x64
 ArchitecturesAllowed=x64
 AppName=aichords
-OutputBaseFilename="AIChords Installer"
-AppVersion=0.9.0-1
+OutputBaseFilename="AI Chords Installer"
+AppVersion=0.9.0-2
 WizardStyle=modern
 DefaultDirName={autopf}\dBdone
 DefaultGroupName=dBdone
