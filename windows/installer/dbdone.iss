@@ -8,7 +8,7 @@ ArchitecturesInstallIn64BitMode=x64
 ArchitecturesAllowed=x64
 AppName=dBdone
 OutputBaseFilename="dBdone Installer"
-AppVersion=0.9.0-7
+AppVersion=9.9.9+99
 WizardStyle=modern
 DefaultDirName={autopf}\dBdone
 DefaultGroupName=dBdone
@@ -21,6 +21,7 @@ LicenseFile="terms-of-service.rtf"
 [Files]
 Source: "VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall; Components: main
 Source: "..\..\..\native\app\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Components: main
+Source: "..\..\..\native\components\dbDoneBackend\lib\Release\dbdone_backend.dll"; DestDir: "{commonappdata}\dBdone\app"; Flags: ignoreversion; Components: main
 Source: "..\..\..\native\plugins\dbdone\Builds\VisualStudio2022\x64\Release\VST3\dbdone.vst3\*"; DestDir: "{commoncf}\VST3\dbdone.vst3"; Flags: ignoreversion recursesubdirs; Components: plugins\dbdoneVST
 Source: "..\..\..\native\plugins\dbdone\Builds\VisualStudio2022\x64\Release\AAX\dbdone.aaxplugin\*"; DestDir: "{commoncf}\Avid\Audio\Plug-Ins\dbdone.aaxplugin"; Flags: ignoreversion recursesubdirs; Components: plugins\dbdoneAAX
 
