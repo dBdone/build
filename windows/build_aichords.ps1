@@ -112,9 +112,9 @@ catch {
   exit 1
 }
 
-echo running Projucer...
-$PROJUCER="C:\JUCE\Projucer.exe"
-$PROJUCER --resave $NATIVE_ROOT\plugins\aichords\aichords.jucer 
+Write-Host ("Running Projucer...")
+$PROJUCER = "C:\JUCE\JUCE\Projucer.exe"
+& $PROJUCER --resave "$NATIVE_ROOT\plugins\aichords\aichords.jucer" 
 
 
 & .\build_aichords_plugin.ps1
