@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
-    <title>AI Chords Version 9.9.9+99</title>
+    <title>AI Chords Version 1.2.0-1</title>
     <license file="terms-of-service.html"/>
 
     <pkg-ref id="com.dbdone.aichordsvst.pkg" version="0" onConclusion="none">aichordsVST.pkg</pkg-ref>

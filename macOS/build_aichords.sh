@@ -127,6 +127,10 @@ then
   exit 1
 fi
 
+echo running Projucer...
+PROJUCER="/Users/woolf/JUCE/Projucer.app/Contents/MacOS/Projucer"
+$PROJUCER --resave $NATIVE_ROOT/plugins/aichords/aichords.jucer 
+
 ./build_aichords_plugin_vst.sh
 ./build_aichords_plugin_au.sh
 ./build_aichords_plugin_aax.sh

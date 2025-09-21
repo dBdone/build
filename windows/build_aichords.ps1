@@ -112,6 +112,11 @@ catch {
   exit 1
 }
 
+echo running Projucer...
+$PROJUCER="C:\JUCE\Projucer.exe"
+$PROJUCER --resave $NATIVE_ROOT\plugins\aichords\aichords.jucer 
+
+
 & .\build_aichords_plugin.ps1
 
 Write-Host ("+" * 30)
