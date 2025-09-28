@@ -114,7 +114,10 @@ catch {
 
 Write-Host ("Running Projucer...")
 $PROJUCER = "C:\JUCE\JUCE\Projucer.exe"
-& $PROJUCER --resave "$NATIVE_ROOT\plugins\aichords\aichords.jucer" 
+
+Start-Process -FilePath $PROJUCER `
+  -ArgumentList @('--resave', "$NATIVE_ROOT\plugins\aichords\aichords.jucer") `
+  -Wait -NoNewWindow -PassThru | Out-Null
 
 
 & .\build_aichords_plugin.ps1

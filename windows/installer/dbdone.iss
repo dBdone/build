@@ -24,6 +24,7 @@ Source: "..\..\..\native\app\build\windows\x64\runner\Release\*"; DestDir: "{app
 Source: "..\..\..\native\components\dbDoneBackend\lib\Release\dbdone_backend.dll"; DestDir: "{commonappdata}\dBdone\app"; Flags: ignoreversion; Components: main
 Source: "..\..\..\native\plugins\dbdone\Builds\VisualStudio2022\x64\Release\VST3\dbdone.vst3\*"; DestDir: "{commoncf}\VST3\dbdone.vst3"; Flags: ignoreversion recursesubdirs; Components: plugins\dbdoneVST
 Source: "..\..\..\native\plugins\dbdone\Builds\VisualStudio2022\x64\Release\AAX\dbdone.aaxplugin\*"; DestDir: "{commoncf}\Avid\Audio\Plug-Ins\dbdone.aaxplugin"; Flags: ignoreversion recursesubdirs; Components: plugins\dbdoneAAX
+Source: "..\..\..\native\components\dbDoneBackend\lib\Release\dbdone_backend.dll"; DestDir: "{commonappdata}\dBdone\dbdone-app"; Flags: ignoreversion recursesubdirs
 
 ;will produce warnings, since installation is system-wide and deinstall requires per-user mode
 ;[UninstallDelete]
