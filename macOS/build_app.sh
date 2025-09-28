@@ -139,12 +139,14 @@ mkdir -p $APP_DEST
 
 echo compiling Flutter app...
 
-xcodebuild archive -quiet -destination "generic/platform=macOS,name=Any Mac" \
-  -workspace $NATIVE_ROOT/app/macos/Runner.xcworkspace \
-  -scheme Runner -archivePath dbdone.xcarchive
-
 mkdir -p $SYMBOLS
 rm -rf $SYMBOLS/*
+
+xcodebuild archive -quiet -destination "generic/platform=macOS,name=Any Mac" \
+  -workspace $NATIVE_ROOT/app/macos/Runner.xcworkspace \
+  -scheme Runner -archivePath dbdone.xcarchive \
+  DART_OBFUSCATION=true \
+  SPLIT_DEBUG_INFO=${SYMBOLS:a}/$(date +%Y%m%d-%H%M%S)
 
 BASIC_ROOT_APP=./installer/basic_root_app 
 BASIC_DEST_APP="$BASIC_ROOT_APP/Library/Application Support/com.dbdone.dbdone-app/"
@@ -155,8 +157,7 @@ mkdir -p $BASIC_DEST_APP
 echo copying basic...
 cp ../../native/components/dbDoneBackend/Lib/dbdone_backend.dylib $BASIC_DEST_APP
 
-
-mv dbdone.xcarchive/dSYMs/* $SYMBOLS
+# mv dbdone.xcarchive/dSYMs/* $SYMBOLS
 
 mv dbdone.xcarchive/Products/Applications/* $APP_DEST
 rm -rf dbdone.xcarchive
