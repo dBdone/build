@@ -37,6 +37,10 @@ sed -i '' -E \
 
 echo "Patched installer file $dist_file"
 
+pkgbuild --identifier com.dbdone.appbasic.pkg \
+    --sign "Developer ID Installer: Wolfgang Schneider (3ZW8CQVDYJ)" \
+    --root ./basic_root_app "appBASIC.pkg" 
+
 pkgbuild --identifier com.dbdone.app.pkg \
     --sign "Developer ID Installer: Wolfgang Schneider (3ZW8CQVDYJ)" \
     --root ./app_root "dBdoneAPP.pkg" 
@@ -66,5 +70,6 @@ rm dBdoneAPP.pkg
 rm dBdoneVST.pkg
 rm dBdoneAU.pkg
 rm dBdoneAAX.pkg
+rm appBASIC.pkg
 
 

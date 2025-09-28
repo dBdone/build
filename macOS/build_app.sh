@@ -146,6 +146,16 @@ xcodebuild archive -quiet -destination "generic/platform=macOS,name=Any Mac" \
 mkdir -p $SYMBOLS
 rm -rf $SYMBOLS/*
 
+BASIC_ROOT_APP=./installer/basic_root_app 
+BASIC_DEST_APP="$BASIC_ROOT_APP/Library/Application Support/com.dbdone.dbdone-app/"
+
+rm -rf $BASIC_ROOT_APP/*
+mkdir -p $BASIC_DEST_APP
+
+echo copying basic...
+cp ../../native/components/dbDoneBackend/Lib/dbdone_backend.dylib $BASIC_DEST_APP
+
+
 mv dbdone.xcarchive/dSYMs/* $SYMBOLS
 
 mv dbdone.xcarchive/Products/Applications/* $APP_DEST
