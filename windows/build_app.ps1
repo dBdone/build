@@ -94,6 +94,11 @@ Write-Host ("+" * 30)
 Write-Host "Building App..."
 Write-Host ("+" * 30)
 
+$SYMBOLS_FOLDER = "$PWD\symbols"
+if (-not (Test-Path $SYMBOLS_FOLDER)) {
+  New-Item -ItemType Directory -Path $SYMBOLS_FOLDER | Out-Null
+}
+
 Push-Location "$NATIVE_ROOT\app"
 
 Write-Host ("Patching pubspec.yaml...")
@@ -109,7 +114,7 @@ catch {
 }
 
 & flutter clean 
-& flutter build windows
+& flutter build windows --obfuscate --split-debug-info="$SYMBOLS_FOLDER" --tree-shake-icons
 Pop-Location
 
 Write-Host "Copying dbdone_backend.dll..."
