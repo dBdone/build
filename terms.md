@@ -1,13 +1,17 @@
+Last update: 29. September 2025
+
 ## 1. Scope of application
 
-**1.1.** These General Terms and Conditions ("GTC" or "Terms ofService") are
+**1.1.** These General Terms and Conditions ("GTC" or "Terms of Service") are
 applied by dBdone UG (haftungsbeschränkt), (hereinafter referred to as
 "dBdone").
 
 **1.2.** dBdone has developed the dBdone software, \[an organizational tool to
 enhance productivity and communication\] (the "Software" or "App"), and offers
 the Software under a Software-as-a-Service model ("SaaS") and the App for
-download on MacOS and Windows electronic device.
+download on MacOS and Windows electronic device. dBdone also offers various
+plugins, AI services, cloud storage solutions, and other digital products and
+services.
 
 **1.3.** The precise system requirements and the full scope of functions of the
 Software are found in the product description on the distribution platform used
@@ -22,10 +26,37 @@ user (whether an individual, company, or partnership vested with legal capacity)
 who enters into the relevant contract in the conduct of its business or
 self-employed professional activity (§ 14 of the German Civil Code (BGB)).
 
-**1.5.** The legal relationship between dBdone and the Customer is exclusively
-governed by these GTC. General terms and conditions of the Customerare excluded.
-Counter-confirmations of the Customer with reference to the Customer’s terms and
-conditions are hereby contradicted.
+**1.4.1.** Users must be at least 16 years old to use dBdone services. Users
+between 13-15 years old may use the services with parental consent. Users under
+13 years old are not permitted to use the services.
+
+**1.4.2.** By using the services, users represent and warrant that they meet the
+age requirements and, if applicable, have obtained necessary parental consent.
+
+**1.5.** Export Controls and International Use
+
+**1.5.1.** dBdone services and software are subject to German and international
+export control laws and regulations.
+
+**1.5.2.** Customers may not use the services in violation of any applicable
+export control laws or regulations, including but not limited to the German
+Foreign Trade Act (AWG) and EU export control regulations.
+
+**1.5.3.** Customers represent and warrant that they are not located in, under
+the control of, or a national or resident of any country subject to
+comprehensive sanctions or export restrictions.
+
+**1.5.4.** dBdone reserves the right to restrict or terminate access to services
+in certain jurisdictions where the provision of services may violate local laws
+or regulations.
+
+**1.5.5.** Customers are responsible for ensuring compliance with all applicable
+local laws and regulations in their jurisdiction.
+
+**1.6.** The legal relationship between dBdone and the Customer is exclusively
+governed by these GTC. General terms and conditions of the Customer are
+excluded. Counter-confirmations of the Customer with reference to the Customer’s
+terms and conditions are hereby contradicted.
 
 ## 2. Subject of the contract
 
@@ -43,29 +74,30 @@ pertinent state of the art.
 patches, updates, and upgrades and make improvements if these (i) serve
 technical progress or (ii) appear necessary to prevent misuse. In addition,
 dBdone may modify the Software and/or the Service if (i) applicable law requires
-such modifications, (ii) the modificationsare beneficial to the Customer, and
+such modifications, (ii) the modifications are beneficial to the Customer, and
 (iii) the modifications are purely technical or procedural and do not materially
 affect the Customer. All other changes are subject to section 14 of these GTC.
 
 **2.4.** dBdone does not owe an adaptation of the Service to the needs of the
-Customer. Upgrades such as additional features may be made availableto the
+Customer. Upgrades such as additional features may be made available to the
 Customer by agreement and, if applicable, against separate remuneration.
 
 ## 3. Registration, Sign-up
 
-**3.1.** The usage of the Service requires the registration as well as the
-set-up of a user account (the "User Account") by filling in the name, address,
-email address as well as a password and a username. During the initial
-registration, by pressing \[“Create Account”\] or \[“Sign Up”\] and clicking the
-checkbox “I accept the Terms of Service and the Privacy Policy”, the Customer
-submits an offer on the conclusion of the agreement to use the Service according
-to the Terms of Service (the “Agreement”). If the Customer chooses a paid
-subscription, the Customer will also be asked for payment information and the
-Customer will be informed that by clicking the button \[“Subscribe to paid
-plan”\] dBdone has the right to charge the fees via the Customer’s chosen
-payment option respectively. Otherwise, the registration is free of charge.
-dBdone will accept the Customer’s offer by sending a confirmation email orby
-providing the Service to the Customer.
+**3.1.** The usage of certain Services requires the registration and set-up of a
+user account (the "User Account") through various methods including email
+registration, magic link authentication, Google account, or Apple account
+sign-in. Some products may be downloaded and used without registration for trial
+periods. During the initial registration, by completing the sign-up process and
+clicking the checkbox “I accept the Terms of Service and the Privacy Policy” the
+Customer submits an offer on the conclusion of the agreement to use the Service
+according to the Terms of Service (the “Agreement”). If the Customer chooses a
+paid subscription, the Customer will also be asked for payment information and
+the Customer will be informed that by completing the purchase process dBdone has
+the right to charge the fees via the Customer’s chosen payment option
+respectively. Otherwise, the registration is free of charge. dBdone will accept
+the Customer’s offer by sending a confirmation email or by providing the Service
+to the Customer.
 
 **3.2.** When the Customer creates a User Account, the Customer must provide
 dBdone with accurate, complete, and current information at all times. Failure to
@@ -83,12 +115,12 @@ their User Account.
 **3.4.** The Customer may not use a username that is the name of another person
 or entity or that is not lawfully available for use, a name or trademark subject
 to any rights of another person or entity without appropriate authorization, or
-a name that is otherwise offensive, vulgar, or obscene. AS A CONSUMER (as
-defined in clause 1.4 hereof), THE CUSTOMER HAS A RIGHT TO WITHDRAW FROM AN
-AGREEMENT REGARDING A PAID SUBSCRIPTION INACCORDANCE WITH THE STATUTORY
-PROVISIONS AS SHOWN BELOW.
+a name that is otherwise offensive, vulgar, or obscene.\
+AS A CONSUMER (as defined in clause 1.4 hereof), THE CUSTOMER HAS A RIGHT TO
+WITHDRAW FROM AN AGREEMENT REGARDING A PAID SUBSCRIPTION IN ACCORDANCE WITH THE
+STATUTORY PROVISIONS AS SHOWN BELOW.
 
-## 4. Provision of the SaaS Software,Service Availability
+## 4. Provision of the SaaS Software, Service Availability
 
 **4.1.** The Software shall be hosted on a server infrastructure licensed by
 dBdone. dBdone shall make the Software available for use at the router outlet
@@ -105,6 +137,29 @@ dBdone's control, and force majeure.
 **4.3.** dBdone will make daily backups and store them for a period of seven
 days.
 
+**4.4** Service Level Agreement (SLA)
+
+**4.4.1.** dBdone aims to provide 99.5% uptime for its SaaS services, measured
+on a monthly basis, excluding scheduled maintenance and events beyond dBdone's
+reasonable control.
+
+**4.4.2.** Planned maintenance will be scheduled during low-usage periods and
+announced with at least 24 hours' notice when possible.
+
+**4.4.3.** The SLA does not apply to service disruptions caused by: (i)
+third-party service providers (e.g., cloud infrastructure, payment processors,
+authentication providers), (ii) customer's internet connection or hardware,
+(iii) force majeure events, (iv) customer misuse or violation of these terms, or
+(v) free services, trial periods, or services provided free of charge.
+
+**4.4.4.** In the event of service unavailability exceeding the SLA threshold
+due to dBdone's direct actions or omissions, customers may be eligible for
+service credits as outlined in the SLA policy available on the Website.
+
+**4.4.5.** Service credits are the sole remedy for SLA breaches and cannot be
+exchanged for monetary compensation. Total service credits in any calendar month
+shall not exceed 100% of the monthly service fee.
+
 ## 5. Support services
 
 **5.1.** The scale of the support services shall depend on the scope agreed upon
@@ -117,7 +172,7 @@ Support requests are generally processed within dBdone's normal business hours.
 
 ## 6. Fees
 
-**6.1.** For paid accounts, the Customer shall pay dBdone the agreed monthlyor
+**6.1.** For paid accounts, the Customer shall pay dBdone the agreed monthly or
 annual fee depending on the agreed Features ("Features" will be further defined
 on the Website).
 
@@ -134,29 +189,147 @@ accordingly for the remaining period of the Agreement's term. The Customer may
 also decrease the type of Features accordingly, in that case, the corresponding
 lower fee will be charged with the beginning of the following billing cycle.
 
-**6.4.** dBdone Plans. We offer different plans tailored to your needs. Bedroom
-and Studio are subscription-based (monthly or yearly payments), while App Only
-is a one-time purchase with updates for one year. Talent–Free Plan App: 1x
-License (MacOS, Windows), dBdone Plugin(AU/VST/AAX), up to 75 projects, Plugin &
-Tempo Detection(Ableton Live) Statistics: Dashboard Backup Online: Custom Link
-Page (with ads), 3 Spaces (with ads, max. 50MB), Lossless Audio (WAV,AIFF)
-Plugins: AI Chords (10 credits/month) General: Regular support, updates AppOnly
-– One-Time Purchase App: 1x License (MacOS, Windows), dBdone Plugin
-(AU/VST/AAX), Unlimited projects, Plugin & Tempo Detection (Ableton Live)
-Statistics: Dashboard Backup Online: Same as TalentPlan Plugins: AI Chords (10
-credits/month) General: Priority support, 1 year of updates Bedroom–Subscription
-Plan (Monthly/Yearly Payment) App: 1x License(MacOS, Windows), dBdone Plugin
-(AU/VST/AAX), Unlimited projects, Plugin & Tempo Detection (Ableton Live)
-Statistics: Dashboard Backup Online: Custom Link Page (no ads), Unlimited Spaces
-(+password protection, max. 10GB), Lossless Audio (WAV, AIFF) Plugins: AI Chords
-(100 credits/month) General: Priority support, updates. Studio–Subscription Plan
-(Monthly/Yearly Payment) App: 2x Licenses (MacOS,Windows), install on two
-devices, dBdone Plugin (AU/VST/AAX), Unlimited projects, Plugin & Tempo
-Detection (Ableton Live) Statistics: Dashboard Backup Online: Custom Link Page
-(no ads), Unlimited Spaces (+ password protection, max. 100GB), Lossless
-Audio(WAV, AIFF) Plugins: AI Chords (250 credits/month) General: Priority
-support, updates We reserve the right to update plan features as needed. For
-pricing details, visit our official pricing page.
+**6.3.1.** dBdone reserves the right to change prices for its products and
+services with 30 days' notice to existing customers. Price changes will be
+communicated via email or through the User Account. Existing customers may
+cancel their subscription before the price change takes effect if they disagree
+with the new pricing. Price changes do not affect already paid periods.
+
+**6.4** dBdone Products and Services
+
+We offer various products and services tailored to your needs:
+
+**dBdone App** – Lifetime License App: 1x License (MacOS, Windows), dBdone
+Plugin (AU/VST/AAX), Unlimited projects, Plugin & Tempo Detection (Ableton Live)
+Statistics: Dashboard Backup General: Priority support, lifetime updates
+
+**dBdone Spaces** – Cloud Storage Service Free Version: 50MB storage, 3 Spaces
+max, compressed audio, no password protection Lite Version: 25GB storage,
+unlimited spaces, uncompressed audio, password protection Pro Version: 100GB
+storage, unlimited spaces, uncompressed audio, password protection
+
+**AI Credits Packs** – For AI-powered plugins Available in S, M, and L sizes for
+use with dBdone AI plugins (currently AI Chords) Credits are consumed
+immediately upon use and are non-refundable after use
+
+**Bedroom Bundle** – Subscription Plan (Monthly/Yearly Payment) App: 1x License
+(MacOS, Windows), dBdone Plugin (AU/VST/AAX), Unlimited projects, Plugin & Tempo
+Detection (Ableton Live) Statistics: Dashboard Backup Online:
+my.dbdone.com/username link, Spaces Lite (25GB storage), Lossless Audio (WAV,
+AIFF) Plugins: AI Chords (100 credits/month) General: Priority support, updates
+
+**Studio Bundle** – Subscription Plan (Monthly/Yearly Payment) App: 2x Licenses
+(MacOS, Windows), install on two devices, dBdone Plugin (AU/VST/AAX), Unlimited
+projects, Plugin & Tempo Detection (Ableton Live) Statistics: Dashboard Backup
+Online: my.dbdone.com/username link, Spaces Pro (100GB storage), Lossless Audio
+(WAV, AIFF) Plugins: AI Chords (250 credits/month) General: Priority support,
+updates
+
+**Pentimento Plugin** – Collaboration with TAETRO VST, AU, AAX plugin for MacOS
+and Windows Free version with limited samples and functions Full version
+includes 3 TAETRO sample packs and custom sample functionality
+
+We reserve the right to update product features and pricing as needed. For
+current pricing details, visit our official pricing page.
+
+**6.5.** AI Credits and Earned Credits
+
+**6.5.1.** AI Credits Packs are digital products that provide credits for use
+with dBdone AI-powered plugins. Credits are consumed immediately upon use and
+cannot be transferred between users.
+
+**6.5.2.** dBdone may offer free AI credits through various promotional
+activities, account tasks, or as part of product bundles. These earned credits
+are subject to the same terms as purchased credits.
+
+**6.5.3.** AI Credits have no cash value and cannot be exchanged for money or
+other products. Unused credits may expire after a period of inactivity as
+specified in the User Account.
+
+**6.5.4.** For AI Credits Packs, customers have a 14-day withdrawal right for
+unused credits only. Once credits are consumed, they are non-refundable. Refund
+requests must be made via email to hello@dbdone.com.
+
+**6.6** License Keys and Registration Tokens
+
+**6.6.1.** Upon purchase of dBdone App, AI Chords plugin, Pentimento plugin, or
+other licensed products, customers receive a unique Registration Token that can
+be found in their account under "My Products" (/my\_products).
+
+**6.6.2.** Registration Tokens are required to activate and use the purchased
+products. Customers must copy the token and paste it into the respective
+application or plugin when prompted during installation or activation.
+
+**6.6.3.** Registration Tokens are personal and non-transferable. Sharing,
+selling, or distributing tokens to third parties is prohibited and may result in
+license termination.
+
+**6.6.4.** Customers are responsible for keeping their Registration Tokens
+secure and confidential. Lost or compromised tokens may be replaced at dBdone's
+discretion.
+
+**6.7.** Trial Periods
+
+**6.7.1.** dBdone may offer trial periods for certain products and services,
+typically lasting 14 days from the date of download or activation.
+
+**6.7.2.** During the trial period, customers have access to the full
+functionality of the product without payment. No credit card or payment
+information is required to start a trial.
+
+**6.7.3.** Trial periods automatically expire after the specified duration. To
+continue using the product after the trial period, customers must purchase a
+valid license or subscription.
+
+**6.7.4.** dBdone reserves the right to limit the number of trial periods per
+customer, device, or IP address to prevent abuse.
+
+**6.7.5.** Data created during trial periods may be retained for a limited time
+after expiration to allow for license purchase and data recovery.
+
+**6.8.** Beta Testing Programs
+
+**6.8.1.** dBdone may offer beta testing programs for new features, products, or
+services. Participation in beta programs is voluntary and may be subject to
+additional terms and conditions.
+
+**6.8.2.** Beta software and services are provided "as is" and may contain bugs,
+errors, or incomplete features. Beta participants acknowledge that beta services
+may not be stable or fully functional.
+
+**6.8.3.** Beta participants may be required to provide feedback, report bugs,
+and participate in testing activities. All feedback and bug reports become the
+property of dBdone.
+
+**6.8.4.** Beta participants agree to keep beta features and information
+confidential and not to disclose details about beta programs to third parties.
+
+**6.8.5.** dBdone reserves the right to terminate beta programs at any time and
+may limit or restrict access to beta features without notice.
+
+**6.9.** Important Service Communications
+
+**6.9.1.** dBdone uses MailJet to send important service communications and
+updates to all registered users. These communications are essential for the
+proper functioning of your account and services.
+
+**6.9.2.** Important service communications include, but are not limited to:
+critical service notifications, security updates, billing information, essential
+service changes, account security alerts, and compliance-related information.
+
+**6.9.3.** While important service communications contain critical information
+necessary for account security and service functionality, users may opt out
+using the unsubscribe link provided in MailJet communications. However, opting
+out may result in missing critical service information that could affect your
+account or service access.
+
+**6.9.4.** Users are responsible for ensuring their registered email address
+remains valid and accessible. dBdone is not responsible for missed
+communications due to invalid, inaccessible, or blocked email addresses.
+
+**6.9.5.** For marketing content, updates, and news, users can voluntarily
+subscribe to our Substack newsletter, which is separate from important service
+communications and can be unsubscribed from at any time.
 
 ## 7. Content
 
@@ -166,12 +339,18 @@ form of that content ("Content"). The Customer is responsible for the Content
 that they post to the Service, including its legality, reliability, and
 appropriateness.
 
+**7.1.1.** For the Pentimento plugin, customers may upload their own audio
+samples, images, and create custom sample packs. dBdone is not responsible for
+the legality, copyright compliance, or appropriateness of user-uploaded content.
+Customers are solely responsible for ensuring they have the necessary rights to
+any content they upload and share through the plugin.
+
 **7.2.** By posting Content to the Service, the Customer grants dBdone the right
 and license to use, modify, publicly perform, publicly display, reproduce, and
 distribute such Content on and through the Service to the extent necessary to
 provide the Service ("License"). Apart from that, the Customer retains any and
 all rights to any Content the Customer submits, posts, or displays on or through
-the Service, and the Customer is responsible for protecting those rights.The
+the Service, and the Customer is responsible for protecting those rights. The
 Customer agrees that the License includes the right for dBdone to make the
 Content available to other users of the Service, who may also use the Content
 subject to these Terms of Service.
@@ -185,8 +364,11 @@ rights, copyrights, contract rights, or any other rights of any person.
 ## 8. Content Restrictions
 
 **8.1.** dBdone is not responsible for the content provided by Customers. The
-Customer expressly understands and agrees that the Customer is solel
-yresponsible for the Customer's Content.
+Customer expressly understands and agrees that the Customer is solely
+responsible for the Customer's Content. dBdone acts as a mere technical service
+provider and does not monitor, review, or control user-generated content in
+real-time. dBdone is not liable for any illegal, harmful, or inappropriate
+content uploaded by users to Spaces or other services.
 
 **8.2.** The Customer may not transmit any Content that is unlawful, offensive,
 upsetting, intended to disgust, threatening, libelous, defamatory, obscene, or
@@ -223,7 +405,7 @@ employees, or representatives.
 **8.3.** dBdone reserves the right, but not the obligation, to, in its sole
 discretion, determine whether or not any Content is appropriate and complies
 with these GTC. dBdone may refuse or remove any such Content. dBdone can also
-limit or revoke the use of the Service ifthe Customer posts such objectionable
+limit or revoke the use of the Service if the Customer posts such objectionable
 Content. As dBdone cannot control all content posted by users and/or third
 parties on the Service, the Customer agrees to use the Service at the Customer's
 own risk. The Customer understands that by using the Service, the Customer may
@@ -232,18 +414,33 @@ objectionable, and the Customer agrees that under no circumstances will dBdone
 be liable in any way for any content, including any errors or omissions in any
 content, or any loss or damage of any kind incurred as a result of the
 Customer's use of any content, except where dBdone is liable pursuant to section
-10 hereof.
+12 hereof.
 
-**8.4.** Content Backups
+**8.3.1.** dBdone will respond to valid legal requests for content removal in
+accordance with applicable law and cooperate with law enforcement agencies when
+required by German or EU law.
 
-**8.4.1.** Although regular backups of Content are performed, dBdone does not
-guarantee there will be no loss or corruption of data.
+**8.3.2.** Users may report inappropriate content through the designated
+reporting mechanisms. dBdone will review reported content and take appropriate
+action in accordance with these terms and applicable law.
 
-**8.4.2.** The Customer shall make backup copies of data transmitted to
-theService on the Customer’s own data carriers in order to ensure the
-reconstruction of the data and information in the event of loss.
+### 8.4 Content Backups
 
-**8.4.3.** Corrupt or invalid backup points may be caused by, without
+**8.4.1.** For dBdone Spaces and other cloud-based services, dBdone performs
+regular backups of user content. However, dBdone does not guarantee there will
+be no loss or corruption of data.
+
+**8.4.2.** For the dBdone App, users are responsible for creating their own
+backups using the built-in export/import functionality. dBdone has no access to
+or control over data stored locally on users' devices and is not responsible for
+any loss of App data, including projects, names, images, tags, audio prelisten
+files, or other locally stored content.
+
+**8.4.3.** Users are responsible for ensuring they have copies of any important
+data they upload to cloud services, as dBdone cannot guarantee data recovery in
+all circumstances.
+
+**8.4.4.** Corrupt or invalid backup points may be caused by, without
 limitation, Content that is corrupted prior to being backed up or that changes
 during the time a backup is performed.
 
@@ -252,7 +449,7 @@ during the time a backup is performed.
 **9.1.** The Customer will indemnify, defend, and hold harmless dBdone and its
 officers, directors, and employees from any and all claims, suits, litigation,
 causes of action, losses, damages, expenses, costs (including court costs and
-attorneys’ fees), and liabilities(“Losses”) that arise out of, or in connection
+attorneys’ fees), and liabilities (“Losses”) that arise out of, or in connection
 with (i) the Customer’s use of the Services; (ii) any breach by the Customer of
 the obligations outlined in section 8.2 hereof; or (iii) any claim that the
 Customer’s Content caused damage to a third party. If the Customer is a
@@ -286,10 +483,29 @@ Software. The Customer has no claim to access or surrender of the Software’s
 source code.
 
 **10.5.** The Software may include Open Source Software components. Use of such
-components is subject to the corresponding terms of use for the OpenSource
+components is subject to the corresponding terms of use for the Open Source
 Software, which are furnished and/or cited in conjunction with the Open Source
 Software components. If contradictions arise between Open Source license terms
 and these GTC, the license terms for the Open Source Software will prevail.
+
+**10.6.** Intellectual Property Protection
+
+**10.6.1.** All intellectual property rights in the Software, including but not
+limited to copyrights, trademarks, patents, trade secrets, and other proprietary
+rights, remain the exclusive property of dBdone and its licensors.
+
+**10.6.2.** Customers retain ownership of their Content but grant dBdone a
+limited license to use such Content as necessary to provide the services.
+
+**10.6.3.** dBdone respects intellectual property rights and will respond to
+valid copyright infringement claims in accordance with applicable law, including
+the Digital Millennium Copyright Act (DMCA) where applicable.
+
+**10.6.4.** Customers may not use dBdone's trademarks, logos, or other
+intellectual property without prior written consent.
+
+**10.6.5.** Any feedback, suggestions, or ideas provided by customers regarding
+the services may be used by dBdone without compensation or attribution.
 
 ## 11. Warranty
 
@@ -297,11 +513,11 @@ and these GTC, the license terms for the Open Source Software will prevail.
 description. Claims for defects in updates, upgrades, or new versions are
 limited to innovations compared to previous versions.
 
-**11.2.** Statutory provisions on warranty in rental agreements and §§ 327 ets
-eq BGB apply. However, the application of § 536a (2) BGB (tenant’s right to
+**11.2.** Statutory provisions on warranty in rental agreements and §§ 327 et
+seq BGB apply. However, the application of § 536a (2) BGB (tenant’s right to
 remedy defects himself) is excluded.
 
-**11.3.** Otherwise, the provisions of the law on service contracts (§§ 611et
+**11.3.** Otherwise, the provisions of the law on service contracts (§§ 611 et
 seq. BGB) apply.
 
 **11.4.** dBdone does not warrant that the Customer's business expectations
@@ -310,15 +526,16 @@ associated with using the Software will be realized.
 **11.5.** dBdone does not provide any additional warranty for the Software
 without express confirmation.
 
-**11.6.** Any claims for damages shall be subject to the limitations set out
-insection 12.
+**11.6.** Any claims for damages shall be subject to the limitations set out in
+section 12.
 
 ## 12. Liability of dBdone for Damages to the Customer
 
 **12.1.** dBdone shall be liable for damages or reimbursement of fruitless
 expenses in the following cases to an unlimited extent and in accordance with
-statutory limitation periods: 12.1.1 in cases of intent and gross negligence by
-dBdone;
+statutory limitation periods:
+
+**12.1.1.** in cases of intent and gross negligence by dBdone;
 
 **12.1.2.** in the event of personal injury for which dBdone is responsible;
 
@@ -337,10 +554,28 @@ force majeure (incl. strikes, natural disasters, pandemics) and simple negligent
 breaches of non-material contractual obligations. Strict liability for initial
 defects (§ 536a (1) BGB) is excluded.
 
-**12.4.** dBdone retains the right to object due to contributory negligence on
+**12.4.** Force Majeure
+
+**12.4.1.** dBdone shall not be liable for any failure or delay in performance
+under these Terms of Service that is due to force majeure, which includes but is
+not limited to: acts of God, natural disasters, war, terrorism, civil unrest,
+government actions, labor disputes, pandemics, cyber attacks, internet outages,
+power failures, or other events beyond dBdone's reasonable control.
+
+**12.4.2.** In the event of force majeure, dBdone will use reasonable efforts to
+minimize the impact on services and will notify customers of any significant
+service disruptions.
+
+**12.4.3.** If force majeure continues for more than 30 days, either party may
+terminate the affected services with 7 days' written notice.
+
+**12.4.4.** During force majeure events, customers remain responsible for any
+fees or charges that have already been incurred.
+
+**12.5.** dBdone retains the right to object due to contributory negligence on
 the part of the Customer.
 
-**12.5.** dBdone shall only be liable for the loss of data up to the amount that
+**12.6.** dBdone shall only be liable for the loss of data up to the amount that
 would have been incurred to restore the data if it had been properly and
 regularly backed up.
 
@@ -353,11 +588,11 @@ provided by dBdone free of charge:
 
 **13.2.** If the Customer has suffered harm from a defect, dBdone shall owe
 damages only if the defect was willfully concealed by dBdone. Otherwise,
-dBdone's liability shall be limited to intentionand gross negligence.
+dBdone's liability shall be limited to intention and gross negligence.
 
 ## 14. Data Protection and Data Security
 
-**14.1.** Where necessary, the Customer and dBdone shall enter into anagreement
+**14.1.** Where necessary, the Customer and dBdone shall enter into an agreement
 which is subject to commissioned processing and technical organizational
 measures (TOM) in accordance with the template provided by dBdone.
 
@@ -365,6 +600,26 @@ measures (TOM) in accordance with the template provided by dBdone.
 ensure data security. Personal data and business-critical data are stored in a
 secure environment (protected by firewall, password protection, encryption,
 etc.).
+
+**14.3.** Data Retention and Deletion
+
+**14.3.1.** Customer data will be retained for the duration of the active
+service period and for a reasonable period thereafter as required by law or for
+legitimate business purposes.
+
+**14.3.2.** Upon account termination, customer data will be deleted within 30
+days, except where retention is required by law or for legitimate business
+purposes such as fraud prevention.
+
+**14.3.3.** Customers may request data export in standard formats (CSV, JSON)
+before account termination. Data export requests will be processed within 14
+business days.
+
+**14.3.4.** Backup data containing customer information will be retained for up
+to 90 days after account termination before permanent deletion.
+
+**14.3.5.** dBdone may retain anonymized usage statistics and aggregated data
+for service improvement purposes indefinitely.
 
 ## 15. Term and Termination
 
@@ -376,10 +631,25 @@ be longer than one month.
 
 **15.2.** The Customer may unsubscribe from any subscription, and thereby
 terminate the Agreement according to the period stated below, without giving
-reason, by using a respective "Termination" button in the User Account. An
-unpaid subscription may be terminated at anytime with immediate effect, whereas
-a paid subscription may only beterminated with effect at the end of the ordered
-Initial Term or theend of the respective Renewed Term.
+reason, by using the cancellation function in their User Account under "My
+Products" (/my\_products). An unpaid subscription may be terminated at any time
+with immediate effect, whereas a paid subscription may only be terminated with
+effect at the end of the ordered Initial Term or the end of the respective
+Renewed Term.
+
+**15.2.1.** For monthly subscriptions, cancellation takes effect at the end of
+the current billing period. No further charges will be made after the
+cancellation date, and the Customer retains access to the Service until the end
+of the paid period.
+
+**15.2.2.** For yearly subscriptions, cancellation takes effect at the end of
+the current annual billing period. No refunds are provided for unused portions
+of the yearly subscription, and the Customer retains access to the Service until
+the end of the paid period.
+
+**15.2.3.** Cancellation requests must be submitted through the User Account
+interface. Cancellation requests sent via email or other methods may not be
+processed immediately and do not guarantee cancellation of future charges.
 
 **15.3.** If the Customer wants to delete the entire User Account, the Customer
 may do so by contacting dBdone at hello@dbdone.com or pressing the "Delete
@@ -389,15 +659,15 @@ for the subscription will not be refunded.
 
 **15.4.** The right of either party to terminate the Agreement without notice
 for good cause and the right to terminate the Agreement in accordance with
-section 17 (extraordinary termination in the event of changes tothe GTC) shall
-remain unaffected. dBdone shall be deemed to have agood cause to terminate the
+section 17 (extraordinary termination in the event of changes to the GTC) shall
+remain unaffected. dBdone shall be deemed to have a good cause to terminate the
 contract in particular if (i) the Customer fails to comply with any applicable
 legal provisions or (ii) the Customer fails to comply with any terms of these
 Terms of Service, in particular section 12.2, and, where reasonable, dBdone has
 given the Customer the opportunity to stop any misconduct but the Customer
 failed to do so.
 
-**15.5.** With the end of the Agreement, the rights to use the Softwarepursuant
+**15.5.** With the end of the Agreement, the rights to use the Software pursuant
 to clause 7 shall automatically end without any declaration being required from
 dBdone. However, the Customer of SaaS Services shall have the right to export
 the Customer’s data in CSV format within seven (7) days from the end of the
@@ -408,7 +678,7 @@ Agreement.
 dBdone reserves the right to change or amend these GTC. The planned changes or
 amendments shall be announced to the Customer by e-mail or in writing with a
 reasonable period of notice before the planned entry into force. If the Customer
-does not object to the amended GTC intext form (e.g. letter or e-mail) within
+does not object to the amended GTC in text form (e.g. letter or e-mail) within
 six (6) weeks after receipt of the e-mail, the amended GTC shall be deemed
 accepted, unless such changes affect any primary obligations of dBdone to
 provide the Service with the main functions as agreed between the parties. In
@@ -436,13 +706,33 @@ services.
 and privacy policies of any third-party websites or services that the Customer
 visits.
 
+**17.4.** Third-Party Services Integration
+
+**17.4.1.** dBdone integrates with third-party services including but not
+limited to Google, Apple, Stripe, PayPal, and cloud infrastructure providers to
+provide its services.
+
+**17.4.2.** When customers use third-party authentication (Google, Apple),
+certain profile information may be shared with dBdone in accordance with the
+third-party's privacy policy and user consent.
+
+**17.4.3.** Payment processing is handled by third-party providers (Stripe,
+PayPal). dBdone does not store credit card information and is not responsible
+for the security of payment data handled by third-party processors.
+
+**17.4.4.** dBdone is not liable for any issues, outages, or data breaches that
+occur with third-party services, though dBdone will work to minimize service
+disruption.
+
+**17.4.5.** Customers acknowledge that their use of third-party services is
+subject to the respective third-party terms of service and privacy policies.
+
 ## 18. Final Provisions
 
-**18.1.** The European Commission provides a platform for the online
-settlementof disputes which can be accessed under
-http://ec.europa.eu/consumers/odr/. dBdone is neither obliged to take part in
-alternative dispute resolutions before a consumer dispute settlement commission
-nor will do so voluntarily.
+**18.1.** The European Commission provides a platform for the online settlement
+of disputes which can be accessed under http://ec.europa.eu/consumers/odr/.
+dBdone is neither obliged to take part in alternative dispute resolutions before
+a consumer dispute settlement commission nor will do so voluntarily.
 
 **18.2.** The Customer shall only be permitted to offset claims that are
 undisputed by dBdone or have been legally established.
@@ -451,41 +741,64 @@ undisputed by dBdone or have been legally established.
 in connection with this Agreement is Berlin if the Customer is a Business
 Customer. The place of performance is the registered office of dBdone.
 
+**18.3.1.** For consumers, disputes may be resolved through the competent courts
+at the consumer's place of residence or through alternative dispute resolution
+mechanisms.
+
+**18.3.2.** Before initiating formal legal proceedings, both parties agree to
+attempt to resolve disputes through good faith negotiations for a period of 30
+days.
+
+**18.3.3.** dBdone participates in the EU's Online Dispute Resolution platform
+for consumer disputes, accessible at https://ec.europa.eu/consumers/odr/.
+
 **18.4.** The law of the Federal Republic of Germany shall apply exclusively. If
 the Customer is a Consumer and has his/her habitual residence in another
 country, the Customer shall, however, continue to have the protection afforded
-to consumers by provisions that cannot bederogated from by agreement by virtue
+to consumers by provisions that cannot be derogated from by agreement by virtue
 of the law applicable in the state of the Customer’s habitual residence.
 
 **18.5.** Should a provision of these GTC be or become invalid, contain an
 inadmissible deadline provision or a loophole, the legal validity of the
 remaining provisions shall remain unaffected. Insofar as the invalidity does not
-result from a violation of §§ 305 ff. BGB(validity of general terms and
+result from a violation of §§ 305 ff. BGB (validity of general terms and
 conditions), an effective provision which comes closest to the economic
 intentions of the parties shall be deemed to have been agreed in place of the
 ineffective provision. The same shall apply in the event of a loophole. In the
 event of an invalid term, the legally permissible term shall apply.
 
-## Instruction on Withdrawal
+## Instruction on Withdrawal and Money-Back Guarantee
 
-**Rightof Withdrawal:** You have the right to withdraw from this contract within
-14 days without giving any reason. The withdrawal period will expire 14 days
-from the day of the conclusion of the contract. To exercise the right of
-withdrawal, you must inform us by an unequivocal statement (e.g., a letter sent
-by post, fax, or e-mail) to:
+### Right of Withdrawal:
 
-_dBdone UG (haftungsbeschränkt) Cosimastraße 121, 81925 München, Deutschland._\
-_Email: hello@dbdone.com_
+You have the right to withdraw from this contract within 14 days without giving
+any reason. The withdrawal period will expire 14 days from the day of the
+conclusion of the contract. To exercise the right of withdrawal, you must inform
+us by an unequivocal statement (e.g., a letter sent by post, fax, or e-mail) to:
 
-**Effectsof Withdrawal:** If you withdraw from this contract, we shall reimburse
-to you all payments received from you, including the costs of delivery (with the
-exception of the supplementary costs resulting from your choice of a type of
-delivery other than the least expensive type of standard delivery offered by
-us), without undue delay and in any event not later than 14 days from the day on
-which we are informed about your decision to withdraw from this contract. We
-will carry out such reimbursement using the same means of payment as you used
-for the initial transaction, unless you have expressly agreed otherwise; in any
-event, you will not incur any fees as a result of such reimbursement.
+**dBdone UG (haftungsbeschränkt)**\
+Cosimastraße 121, 81925, München, Deutschland\
+Email: hello@dbdone.com
+
+### 30-Day Money-Back Guarantee:
+
+dBdone offers a 30-day money-back guarantee for all paid products and services.
+If you are not satisfied with your purchase, you may request a full refund
+within 30 days of purchase by contacting us at hello@dbdone.com. This guarantee
+applies to all products except AI Credits that have been consumed, which are
+non-refundable after use.
+
+### Effects of Withdrawal:
+
+If you withdraw from this contract, we shall reimburse to you all payments
+received from you, including the costs of delivery (with the exception of the
+supplementary costs resulting from your choice of a type of delivery other than
+the least expensive type of standard delivery offered by us), without undue
+delay and in any event not later than 14 days from the day on which we are
+informed about your decision to withdraw from this contract. We will carry out
+such reimbursement using the same means of payment as you used for the initial
+transaction, unless you have expressly agreed otherwise; in any event, you will
+not incur any fees as a result of such reimbursement.
 
 If you requested to begin the performance of services during the withdrawal
 period, you shall pay us an amount which is in proportion to what has been
