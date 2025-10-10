@@ -93,34 +93,7 @@ Write-Host ("+" * 30)
 Write-Host "Building AIChords plugin..."
 Write-Host ("+" * 30)
 
-
-# Write the version header
-Write-Host ("Creating version header...")
-
-$VERSION_HEADER_CONTENT = @(
-  '#pragma once'
-  ''
-  "#define SYSTEM_VERSION `"$version`""
-)
-
-try {
-  $VERSION_HEADER_CONTENT | Set-Content -LiteralPath $VERSION_HEADER_FILE -Encoding UTF8
-  Write-Host "Successfully wrote $VERSION_HEADER_FILE with SYSTEM_VERSION = `"$version`"."
-}
-catch {
-  Write-Error "Failed to write $VERSION_HEADER_FILE"
-  exit 1
-}
-
-Write-Host ("Running Projucer...")
-$PROJUCER = "C:\JUCE\JUCE\Projucer.exe"
-
-Start-Process -FilePath $PROJUCER `
-  -ArgumentList @('--resave', "$NATIVE_ROOT\plugins\aichords\aichords.jucer") `
-  -Wait -NoNewWindow -PassThru | Out-Null
-
-
-& .\build_aichords_plugin.ps1
+& .\build_aichords_plugin.ps1 $version
 
 Write-Host ("+" * 30)
 Write-Host "Building installer..."

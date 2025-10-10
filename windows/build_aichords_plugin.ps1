@@ -1,7 +1,46 @@
+<#
+.SYNOPSIS
+  build dBdone plugin.
+
+.PARAMETER Version
+  Release version, e.g. 1.2.3-4
+#>
+
+param(
+  [Parameter(Mandatory)][string]$Version
+)
+
 $MSBUILD = "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
 $NATIVE_ROOT = "..\..\native"
 $BUILD_FOLDER = "$NATIVE_ROOT\plugins\aichords\Builds\VisualStudio2022"
 $AAX_KEYFILE = "..\..\Orga\aax_cert.p12"
+
+
+# Write the version header
+Write-Host ("Creating version header...")
+
+$VERSION_HEADER_CONTENT = @(
+  '#pragma once'
+  ''
+  "#define SYSTEM_VERSION `"$Version`""
+)
+
+try {
+  $VERSION_HEADER_CONTENT | Set-Content -LiteralPath $VERSION_HEADER_FILE -Encoding UTF8
+  Write-Host "Successfully wrote $VERSION_HEADER_FILE with SYSTEM_VERSION = `"$Version`"."
+}
+catch {
+  Write-Error "Failed to write $VERSION_HEADER_FILE"
+  exit 1
+}
+
+Write-Host ("Running Projucer...")
+$PROJUCER = "C:\JUCE\JUCE\Projucer.exe"
+
+Start-Process -FilePath $PROJUCER `
+  -ArgumentList @('--resave', "$NATIVE_ROOT\plugins\aichords\aichords.jucer") `
+  -Wait -NoNewWindow -PassThru | Out-Null
+
 
 Push-Location $BUILD_FOLDER
 try {
