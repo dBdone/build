@@ -175,6 +175,10 @@ then
   exit 1
 fi
 
+echo running Projucer...
+PROJUCER="/Users/woolf/JUCE/Projucer.app/Contents/MacOS/Projucer"
+$PROJUCER --resave $NATIVE_ROOT/plugins/dbdone/dbdone.jucer 
+
 ./build_dbdone_plugin_vst.sh
 ./build_dbdone_plugin_au.sh
 ./build_dbdone_plugin_aax.sh
