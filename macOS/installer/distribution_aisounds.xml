@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>AI Sounds Version 9.9.9+99</title>
+    <license file="terms-of-service.html"/>
+
+    <pkg-ref id="com.dbdone.aisoundsvst.pkg" version="0" onConclusion="none">aisoundsVST.pkg</pkg-ref>
+    <pkg-ref id="com.dbdone.aisoundsau.pkg" version="0" onConclusion="none">aisoundsAU.pkg</pkg-ref>
+    <pkg-ref id="com.dbdone.aisoundsaax.pkg" version="0" onConclusion="none">aisoundsAAX.pkg</pkg-ref>
+
+    <pkg-ref id="com.dbdone.aisoundsbasic.pkg" version="0" onConclusion="none">aisoundsBASIC.pkg</pkg-ref>
+    <pkg-ref id="com.dbdone.aisoundsirs.pkg" version="0" onConclusion="none">aisoundsIRS.pkg</pkg-ref>
+    <pkg-ref id="com.dbdone.aisoundswavetables.pkg" version="0" onConclusion="none">aisoundsWavetables.pkg</pkg-ref>
+
+    <options customize="always" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <choices-outline>
+        <line choice="aisoundsbasic"/>
+        <line choice="aisoundsirs"/>
+        <line choice="aisoundswavetables"/>
+        <line choice="aisoundsvst"/>
+        <line choice="aisoundsau"/>
+        <line choice="aisoundsaax"/>
+    </choices-outline>
+
+    <choice id="aisoundsbasic"
+        title="Basic (required)"
+        selected="true"
+        enabled="false"
+        visible="false">
+        <pkg-ref id="com.dbdone.aisoundsbasic.pkg"/>
+    </choice>
+
+    <choice id="aisoundsirs"
+        title="Impulse Responses (required)"
+        selected="true"
+        enabled="false"
+        visible="true">
+        <pkg-ref id="com.dbdone.aisoundsirs.pkg"/>
+    </choice>
+
+    <choice id="aisoundswavetables"
+        title="Wavetables (required)"
+        selected="true"
+        enabled="false"
+        visible="true">
+        <pkg-ref id="com.dbdone.aisoundswavetables.pkg"/>
+    </choice>
+
+    <choice id="aisoundsvst" title="AI Sounds Plugin (VST3)" visible="true">
+        <pkg-ref id="com.dbdone.aisoundsvst.pkg"/>
+    </choice>
+    <choice id="aisoundsau" title="AI Sounds Plugin (AU)" visible="true">
+        <pkg-ref id="com.dbdone.aisoundsau.pkg"/>
+    </choice>
+    <choice id="aisoundsaax" title="AI Sounds Plugin (AAX)" visible="true">
+        <pkg-ref id="com.dbdone.aisoundsaax.pkg"/>
+    </choice>
+</installer-gui-script>
