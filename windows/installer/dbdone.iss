@@ -4,11 +4,11 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
 
 [Setup]
-ArchitecturesInstallIn64BitMode=x64
-ArchitecturesAllowed=x64
+ArchitecturesInstallIn64BitMode=x64compatible 
+ArchitecturesAllowed=x64compatible 
 AppName=dBdone
 OutputBaseFilename="dBdone Installer"
-AppVersion=1.3.0-38
+AppVersion=1.3.0-42
 WizardStyle=modern
 DefaultDirName={autopf}\dBdone
 DefaultGroupName=dBdone

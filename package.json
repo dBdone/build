@@ -1,0 +1,23 @@
+{
+  "type": "module",
+  "scripts": {
+    "b": "tsx scripts/cli.ts",
+    "build:mac": "tsx scripts/cli.ts pentimento build --platform mac --mode working",
+    "build:win": "tsx scripts/cli.ts pentimento build --platform win --mode working"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.7.6",
+    "@types/semver": "^7.7.1",
+    "@types/yargs": "^17.0.34",
+    "dotenv": "^16.4.5",
+    "execa": "^9.3.0",
+    "fast-xml-parser": "^4.5.0",
+    "fs-extra": "^11.2.0",
+    "semver": "^7.6.3",
+    "tsx": "^4.7.0",
+    "typescript": "^5.6.3",
+    "yargs": "^17.7.2"
+  }
+}

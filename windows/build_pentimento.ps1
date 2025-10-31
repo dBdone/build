@@ -112,7 +112,7 @@ catch {
   exit 1
 }
 
-& .\build_pentimento_plugin.ps1
+& .\build_pentimento_plugin.ps1 $version
 
 Write-Host ("+" * 30)
 Write-Host "Building installer..."

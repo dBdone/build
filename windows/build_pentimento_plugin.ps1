@@ -1,7 +1,45 @@
+<#
+.SYNOPSIS
+  Build the plugin via MSBuild for a given version.
+.PARAMETER Version
+  Version string to embed in the .iss script, e.g. 1.2.3-456
+#>
+param(
+  [Parameter(Mandatory = $true, Position = 0)]
+  [string]$Version
+)
+
+
+
 $MSBUILD = "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
 $NATIVE_ROOT = "..\..\native"
 $BUILD_FOLDER = "$NATIVE_ROOT\plugins\pentimento\Builds\VisualStudio2022"
 $AAX_KEYFILE = "..\..\Orga\aax_cert.p12"
+
+# Patch version in Projucer project file
+$JUCER_FILE = "$NATIVE_ROOT\plugins\pentimento\pentimento.jucer"
+Write-Host ("Patching version in Projucer project file...")
+[xml]$jucerXml = Get-Content $JUCER_FILE
+$jucerProject = $jucerXml.SelectSingleNode("//JUCERPROJECT")
+if ($jucerProject -and $jucerProject.HasAttribute("version")) {
+  $newVersion = $Version
+  $oldVersion = $jucerProject.GetAttribute("version")
+  $jucerProject.SetAttribute("version", $newVersion)
+  $jucerXml.Save($JUCER_FILE)
+  Write-Host ("Updated version from $oldVersion to $newVersion")
+}
+else {
+  Write-Warning "Could not find version attribute in Projucer project file"
+}
+
+Write-Host ("Running Projucer...")
+$PROJUCER = "C:\JUCE\JUCE\Projucer.exe"
+
+Start-Process -FilePath $PROJUCER `
+  -ArgumentList @('--resave', "$NATIVE_ROOT\plugins\pentimento\pentimento.jucer") `
+  -Wait -NoNewWindow -PassThru | Out-Null
+
+
 
 Push-Location $BUILD_FOLDER
 try {
