@@ -136,7 +136,7 @@ export async function buildPentimento(args: PentimentoArgs) {
           const pkgDir = path.join(paths.dist, 'packages');
           const resources = fromBuild('macOS', 'installer', 'resources');
           const signIdentity = process.env.MACOS_INSTALLER_SIGN_ID;
-          return productbuild(distXml, pkgDir, paths.pkg, resources, signIdentity);
+          return productbuild(distXml, pkgDir, paths.pkg, resources, signIdentity, version.version);
         }],
         ['Notarize + staple', async () => {
           if (args.skipNotarize) return;

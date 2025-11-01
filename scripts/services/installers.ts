@@ -27,16 +27,48 @@ export async function buildInnoSetup(issPath: string, version: string, stagingDi
   await sh(iscc, [tempIss]);
 }
 
-export async function productbuild(distributionXml: string, packagePath: string, outPkg: string, resourcesDir?: string, signIdentity?: string) {
-  const args = ['--distribution', distributionXml, '--package-path', packagePath];
-  if (resourcesDir) {
-    args.push('--resources', resourcesDir);
+export async function productbuild(
+  distributionXml: string,
+  packagePath: string,
+  outPkg: string,
+  resourcesDir?: string,
+  signIdentity?: string,
+  version?: string  // If provided, will patch version in distribution XML
+) {
+  let xmlToUse = distributionXml;
+
+  // If version is provided, create a temporary patched copy of the distribution XML
+  if (version) {
+    const xmlContent = await fs.readFile(distributionXml, 'utf-8');
+
+    // Patch version in title (matches legacy: <title>Pentimento Version 1.2.3+4</title>)
+    const patchedContent = xmlContent.replace(
+      /(<title>.*?Version )[0-9]+\.[0-9]+\.[0-9]+[-+][0-9]+(<\/title>)/,
+      `$1${version}$2`
+    );
+
+    // Write to temporary file in the same directory
+    const tempXml = distributionXml.replace(/\.xml$/, '.tmp.xml');
+    await fs.writeFile(tempXml, patchedContent, 'utf-8');
+    xmlToUse = tempXml;
   }
-  if (signIdentity) {
-    args.push('--sign', signIdentity);
+
+  try {
+    const args = ['--distribution', xmlToUse, '--package-path', packagePath];
+    if (resourcesDir) {
+      args.push('--resources', resourcesDir);
+    }
+    if (signIdentity) {
+      args.push('--sign', signIdentity);
+    }
+    args.push(outPkg);
+    await sh('productbuild', args);
+  } finally {
+    // Clean up temporary XML file if we created one
+    if (version && xmlToUse !== distributionXml) {
+      await fs.remove(xmlToUse);
+    }
   }
-  args.push(outPkg);
-  await sh('productbuild', args);
 }
 
 // Prepare macOS installer resources (terms HTML) from markdown source
