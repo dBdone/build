@@ -11,7 +11,7 @@ import { productbuild, buildInnoSetup, prepareMacInstallerResources, buildMacPac
 import { notarizeAndStaple, setupSigningKeychain } from '../services/notarize.js';
 import { uploadToSupabase, upsertInstallerRow } from '../services/supabase.js';
 import { buildBackendLib } from '../services/backendlib.js';
-import { signAAXPlugin } from '../services/aax_signing.js';
+import { signAAXPlugin, removeInstalledAAXPlugin } from '../services/aax_signing.js';
 
 export interface PentimentoArgs {
   platform: 'mac' | 'win';
@@ -60,6 +60,9 @@ export async function buildPentimento(args: PentimentoArgs) {
     ], logger);
 
     if (args.platform === 'mac') {
+      // Remove existing AAX plugin from system (requires sudo)
+      await runTask('Remove installed AAX plugin', () => removeInstalledAAXPlugin('pentimento'), { logger });
+
       // Setup signing keychain with certificates and notary credentials
       await runTask('Setup signing keychain', () => setupSigningKeychain(), { logger });
 

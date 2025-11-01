@@ -4,6 +4,16 @@ import { fromBuild } from '../utils/root.js';
 import path from 'node:path';
 import fs from 'fs-extra';
 
+// Remove existing AAX plugin from system directory (requires sudo on macOS)
+export async function removeInstalledAAXPlugin(pluginName: string) {
+  const aaxSystemPath = `/Library/Application Support/Avid/Audio/Plug-Ins/${pluginName}.aaxplugin`;
+
+  // Check if the plugin exists before attempting removal
+  if (await fs.pathExists(aaxSystemPath)) {
+    await sh('sudo', ['rm', '-rf', aaxSystemPath]);
+  }
+}
+
 export interface AAXSigningOptions {
   pluginPath: string;       // Path to unsigned AAX plugin (will be replaced with signed version)
   autoinstall?: boolean;    // Auto-install after signing (default: false)
