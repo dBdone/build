@@ -5,6 +5,62 @@ import { requireEnv } from '../utils/env.js';
 import { fromBuild } from '../utils/root.js';
 
 /**
+ * Resolve PROJUCER_EXE value. Accept either a direct binary path or a .app bundle
+ * (e.g. /path/Projucer.app). If a .app is given, try to locate
+ * Contents/MacOS/Projucer inside it. Best-effort: ensure the resulting
+ * file is executable by attempting to chmod it to 0755.
+ */
+function resolveProjucerExe(raw: string): string {
+  if (!raw) throw new Error('PROJUCER_EXE not set');
+  let exe = raw;
+
+  try {
+    const st = fs.statSync(exe);
+    if (st.isDirectory() || exe.endsWith('.app')) {
+      const candidate = path.join(exe, 'Contents', 'MacOS', 'Projucer');
+      if (fs.existsSync(candidate)) exe = candidate;
+      else throw new Error(`Projucer executable not found inside ${exe}`);
+    }
+  } catch (err) {
+    // stat failed — keep raw path and let underlying call fail later
+  }
+
+  // Try to set execute permission (best-effort; may fail in CI/permissioned env)
+  try {
+    fs.accessSync(exe, fs.constants.X_OK);
+  } catch {
+    try { fs.chmodSync(exe, 0o755); } catch { /* ignore failures */ }
+  }
+
+  return exe;
+}
+
+/**
+ * Run Projucer with the provided CLI args. On macOS, if PROJUCER_EXE points
+ * to a .app bundle, prefer launching it via the system 'open' command which is
+ * the standard way to launch app bundles and will let the OS handle quarantines
+ * and code signing UI. For direct binaries, spawn them directly.
+ */
+async function runProjucer(args: string[]) {
+  const raw = requireEnv('PROJUCER_EXE');
+
+  // If the user pointed at an app bundle, use `open -a <app> --args ...`
+  try {
+    const st = fs.statSync(raw);
+    if (st.isDirectory() || raw.endsWith('.app')) {
+      const openExe = '/usr/bin/open';
+      const openArgs = ['-a', raw, '--args', ...args];
+      return await sh(openExe, openArgs);
+    }
+  } catch {
+    // stat failed — fall back to resolving raw as an executable
+  }
+
+  const exe = resolveProjucerExe(raw);
+  return await sh(exe, args);
+}
+
+/**
  * Safely patch the version attribute on the root <JUCERPROJECT ...> tag
  * without round-tripping the whole XML (so entities like &#10; stay unchanged).
  */
@@ -15,9 +71,9 @@ export async function patchJucerVersionSafe(jucerPath: string, newVersion: strin
   const m = src.match(openTagRe);
   if (!m) throw new Error('JUCERPROJECT tag not found');
 
-  const tag      = m[0];
-  const start    = m.index!;                // non-null because matched
-  const end      = start + tag.length;
+  const tag = m[0];
+  const start = m.index!;                // non-null because matched
+  const end = start + tag.length;
 
   // version="..." (or '...') attribute inside the tag
   const verAttrRe = /\bversion\s*=\s*(["'])(.*?)\1/;
@@ -46,25 +102,23 @@ export async function patchAndResaveJucer(jucerPath: string, newVersion: string)
   // Create temp directory in build/tmp
   const tmpDir = fromBuild('tmp', 'projucer');
   await fs.ensureDir(tmpDir);
-  
+
   // Create temp copy
   const jucerFileName = path.basename(jucerPath);
   const tempJucerPath = path.join(tmpDir, jucerFileName);
   await fs.copy(jucerPath, tempJucerPath);
-  
+
   // Patch the temp copy
   await patchJucerVersionSafe(tempJucerPath, newVersion);
-  
-  // Resave with Projucer
-  const exe = requireEnv('PROJUCER_EXE');
-  await sh(exe, ['--resave', tempJucerPath]);
-  
+
+  // Resave with Projucer (use open for .app bundles on macOS)
+  await runProjucer(['--resave', tempJucerPath]);
+
   return tempJucerPath;
 }
 
 export async function projucerResave(jucerPath: string) {
-  const exe = requireEnv('PROJUCER_EXE');
-  await sh(exe, ['--resave', jucerPath]);
+  await runProjucer(['--resave', jucerPath]);
 }
 
 /**
@@ -77,8 +131,7 @@ export async function patchAndResaveJucerNextToOriginal(jucerPath: string, newVe
   const tempJucerPath = path.join(dir, `${base}.tmp.jucer`);
   await fs.copy(jucerPath, tempJucerPath);
   await patchJucerVersionSafe(tempJucerPath, newVersion);
-  const exe = requireEnv('PROJUCER_EXE');
-  await sh(exe, ['--resave', tempJucerPath]);
+  await runProjucer(['--resave', tempJucerPath]);
   await fs.remove(tempJucerPath);
   return tempJucerPath;
 }

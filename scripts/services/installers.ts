@@ -8,25 +8,107 @@ export async function buildInnoSetup(issPath: string, version: string, stagingDi
   const iscc = requireEnv('ISCC_EXE');
   const installerRoot = fromBuild('installer');
   const termsRtf = path.join(installerRoot, 'terms-of-service.rtf');
-  
+
   // Convert terms.md to RTF using pandoc
   const termsMd = path.join(installerRoot, 'terms.md');
   await sh('pandoc', ['-s', '-f', 'gfm', '-t', 'rtf', '-o', termsRtf, termsMd]);
-  
+
   // Read the .iss template
   let issContent = await fs.readFile(issPath, 'utf-8');
-  
+
   // Patch version
   issContent = issContent.replace(/^AppVersion=.*/m, `AppVersion=${version}`);
-  
+
   // Write to a temporary .iss file in the staging area
   const tempIss = path.join(stagingDir, path.basename(issPath));
   await fs.writeFile(tempIss, issContent, 'utf-8');
-  
+
   // Run Inno Setup compiler
   await sh(iscc, [tempIss]);
 }
 
-export async function productbuild(distributionXml: string, packagePath: string, outPkg: string) {
-  await sh('productbuild', ['--distribution', distributionXml, '--package-path', packagePath, outPkg]);
+export async function productbuild(distributionXml: string, packagePath: string, outPkg: string, resourcesDir?: string, signIdentity?: string) {
+  const args = ['--distribution', distributionXml, '--package-path', packagePath];
+  if (resourcesDir) {
+    args.push('--resources', resourcesDir);
+  }
+  if (signIdentity) {
+    args.push('--sign', signIdentity);
+  }
+  args.push(outPkg);
+  await sh('productbuild', args);
+}
+
+// Prepare macOS installer resources (terms HTML) from markdown source
+export async function prepareMacInstallerResources() {
+  const installerRoot = fromBuild('installer');
+  const termsMd = path.join(installerRoot, 'terms.md');
+  const macResources = fromBuild('macOS', 'installer', 'resources');
+
+  // ensure resources dir exists
+  await fs.ensureDir(macResources);
+
+  const outHtml = path.join(macResources, 'terms-of-service.html');
+
+  // Use pandoc to convert markdown to standalone HTML with embedded resources
+  await sh('pandoc', ['-s', '-f', 'gfm', '-t', 'html5', '--embed-resources', '--standalone', '-o', outHtml, termsMd]);
+}
+
+// Definition for a single macOS package to be built
+export interface MacPackageSpec {
+  identifier: string;        // e.g., 'com.dbdone.pentimento.vst3'
+  filename: string;          // e.g., 'pentimentoVST.pkg'
+  stage: (stagingRoot: string) => Promise<void>;  // Function to populate staging directory
+}
+
+// Build macOS packages from a list of package specifications
+// Uses a single staging directory, building packages sequentially and clearing between each
+export async function buildMacPackages(
+  specs: MacPackageSpec[],
+  version: string,
+  outputDir: string
+): Promise<string[]> {
+
+  const signIdentity = requireEnv('MACOS_INSTALLER_SIGN_ID');
+
+  const stagingRoot = path.join(outputDir, 'pkg-staging');
+  const pkgDir = path.join(outputDir, 'packages');
+  await fs.ensureDir(pkgDir);
+
+  const builtPackages: string[] = [];
+
+  for (const spec of specs) {
+    // Clear staging directory
+    await fs.emptyDir(stagingRoot);
+
+    // Let the spec populate the staging directory with its content
+    await spec.stage(stagingRoot);
+
+    // Build the .pkg
+    const outPkg = path.join(pkgDir, spec.filename);
+    await pkgbuild(stagingRoot, spec.identifier, version, outPkg, signIdentity);
+    builtPackages.push(outPkg);
+  }
+
+  // Clean up staging directory
+  await fs.remove(stagingRoot);
+
+  return builtPackages;
+}
+
+// Run pkgbuild to create a .pkg from a package root directory
+export async function pkgbuild(rootDir: string, identifier: string, version: string, outPkg: string, signIdentity?: string) {
+  const args = [
+    '--root', rootDir,
+    '--identifier', identifier,
+    '--version', version,
+    '--install-location', '/',
+  ];
+
+  if (signIdentity) {
+    args.push('--sign', signIdentity);
+  }
+
+  args.push(outPkg);
+  await sh('pkgbuild', args);
 }

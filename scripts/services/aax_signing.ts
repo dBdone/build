@@ -21,6 +21,9 @@ export async function signAAXPlugin(options: AAXSigningOptions) {
   const wcguid = requireEnv('AAX_WCGUID');
   const keyfile = requireEnv('AAX_KEYFILE');
   const keypassword = requireEnv('AAX_KEYPASSWORD');
+  // Optional mac-specific signing identity and wraptool path
+  const signid = process.env['AAX_SIGNID'];
+  const wraptoolExe = process.env['AAX_WRAPTOOL'] || 'wraptool';
 
   // Create temp directory for signed output
   const tmpDir = fromBuild('tmp', 'aax-signing');
@@ -33,7 +36,7 @@ export async function signAAXPlugin(options: AAXSigningOptions) {
   }
 
   // Build wraptool arguments
-  const args = [
+  const args: string[] = [
     'sign',
     '--verbose',
     '--account', account,
@@ -45,12 +48,17 @@ export async function signAAXPlugin(options: AAXSigningOptions) {
     '--out', path.resolve(tmpOutput),
   ];
 
+  // If a mac Developer ID signing identity is provided, pass it through.
+  if (signid && signid.trim() !== '') {
+    args.unshift('--signid', signid);
+  }
+
   if (autoinstall) {
     args.push('--autoinstall', 'on');
   }
 
   // Run wraptool
-  await sh('wraptool', args);
+  await sh(wraptoolExe, args);
 
   // Move signed plugin back to replace unsigned version
   await fs.move(tmpOutput, pluginPath, { overwrite: true });
