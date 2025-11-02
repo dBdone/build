@@ -55,6 +55,13 @@ export async function buildPentimento(args: PentimentoArgs) {
   try {
     // Common preparatory steps
     await pipeline([
+      ['Write version header', async () => {
+        const versionHeaderContent = `#pragma once
+
+#define SYSTEM_VERSION "${version.version}"
+`;
+        await fs.writeFile(paths.versionHeader, versionHeaderContent, 'utf-8');
+      }],
       ['Patch & resave .jucer', () => patchAndResaveJucerNextToOriginal(paths.jucer, `${version.major}.${version.minor}.${version.patch}`)],
       ['Build backend lib', () => buildBackendLib(args.platform, 'Release')],
     ], logger);
