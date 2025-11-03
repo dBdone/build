@@ -19,7 +19,6 @@ export interface PentimentoArgs {
   fakeVersion?: string;              // default "9.9.9-9" for working
   deploy?: boolean;                  // upload + DB insert
   skipNotarize?: boolean;            // for local dry builds
-  json?: boolean;                    // JSON logs
 }
 
 const PENTIMENTO_PRODUCT_TAG = 'tae-pen';
@@ -40,9 +39,7 @@ const paths = {
   iss: path.join(PENTI_INSTALLER_ROOT, 'windows', 'pentimento.iss'),
 };
 
-export async function buildPentimento(args: PentimentoArgs) {
-  const logger = new Logger(!!args.json);
-
+export async function buildPentimento(logger: Logger, args: PentimentoArgs) {
   // Clear and ensure dist directory for clean build
   await fs.emptyDir(paths.dist);
 
@@ -62,7 +59,7 @@ export async function buildPentimento(args: PentimentoArgs) {
 `;
         await fs.writeFile(paths.versionHeader, versionHeaderContent, 'utf-8');
       }],
-      ['Patch & resave .jucer', () => patchAndResaveJucerNextToOriginal(paths.jucer, `${version.major}.${version.minor}.${version.patch}`)],
+      ['Patch & resave .jucer', () => patchAndResaveJucerNextToOriginal(logger, paths.jucer, `${version.major}.${version.minor}.${version.patch}`)],
       ['Build backend lib', () => buildBackendLib(args.platform, 'Release')],
     ], logger);
 

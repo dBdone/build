@@ -3,6 +3,7 @@ import path from 'node:path';
 import { sh } from './exec.js';
 import { requireEnv } from '../utils/env.js';
 import { fromBuild } from '../utils/root.js';
+import type { Logger } from '../utils/logger.js';
 
 /**
  * Resolve PROJUCER_EXE value. Accept either a direct binary path or a .app bundle
@@ -40,23 +41,30 @@ function resolveProjucerExe(raw: string): string {
  * to a .app bundle, prefer launching it via the system 'open' command which is
  * the standard way to launch app bundles and will let the OS handle quarantines
  * and code signing UI. For direct binaries, spawn them directly.
+ * 
+ * IMPORTANT: When using 'open', we pass -W (wait) to block until Projucer exits.
+ * This is critical for operations like --resave where we need to ensure the file
+ * is fully written before proceeding.
  */
-async function runProjucer(args: string[]) {
+async function runProjucer(logger: Logger, args: string[]) {
   const raw = requireEnv('PROJUCER_EXE');
 
-  // If the user pointed at an app bundle, use `open -a <app> --args ...`
+  // If the user pointed at an app bundle, use `open -W -a <app> --args ...`
+  // The -W flag makes open wait until the application exits
   try {
     const st = fs.statSync(raw);
     if (st.isDirectory() || raw.endsWith('.app')) {
       const openExe = '/usr/bin/open';
-      const openArgs = ['-a', raw, '--args', ...args];
+      const openArgs = ['-W', '-a', raw, '--args', ...args];
       return await sh(openExe, openArgs);
     }
-  } catch {
+  } catch (err) {
     // stat failed — fall back to resolving raw as an executable
+    logger.warn('Failed to stat PROJUCER_EXE, falling back to direct execution', { raw, error: String(err) });
   }
 
   const exe = resolveProjucerExe(raw);
+  logger.info('Running Projucer', { method: 'direct', exe, args });
   return await sh(exe, args);
 }
 
@@ -98,7 +106,7 @@ export async function patchJucerVersionSafe(jucerPath: string, newVersion: strin
  * and resave it with Projucer. Returns the path to the temp file.
  * The caller is responsible for cleanup if needed.
  */
-export async function patchAndResaveJucer(jucerPath: string, newVersion: string): Promise<string> {
+export async function patchAndResaveJucer(logger: Logger, jucerPath: string, newVersion: string): Promise<string> {
   // Create temp directory in build/tmp
   const tmpDir = fromBuild('tmp', 'projucer');
   await fs.ensureDir(tmpDir);
@@ -112,26 +120,28 @@ export async function patchAndResaveJucer(jucerPath: string, newVersion: string)
   await patchJucerVersionSafe(tempJucerPath, newVersion);
 
   // Resave with Projucer (use open for .app bundles on macOS)
-  await runProjucer(['--resave', tempJucerPath]);
+  await runProjucer(logger, ['--resave', tempJucerPath]);
 
   return tempJucerPath;
 }
 
-export async function projucerResave(jucerPath: string) {
-  await runProjucer(['--resave', jucerPath]);
+export async function projucerResave(logger: Logger, jucerPath: string) {
+  await runProjucer(logger, ['--resave', jucerPath]);
 }
 
 /**
  * Patch the version in a temp copy of the .jucer file (next to the original),
  * resave with Projucer, then remove the temp file. Returns the temp file path.
  */
-export async function patchAndResaveJucerNextToOriginal(jucerPath: string, newVersion: string): Promise<string> {
+export async function patchAndResaveJucerNextToOriginal(logger: Logger, jucerPath: string, newVersion: string): Promise<string> {
   const dir = path.dirname(jucerPath);
   const base = path.basename(jucerPath, '.jucer');
   const tempJucerPath = path.join(dir, `${base}.tmp.jucer`);
   await fs.copy(jucerPath, tempJucerPath);
   await patchJucerVersionSafe(tempJucerPath, newVersion);
-  await runProjucer(['--resave', tempJucerPath]);
+  await runProjucer(logger, ['--resave', tempJucerPath]);
+
+  // it's absolutely essential that we wait until the call has finished before removing!!!
   await fs.remove(tempJucerPath);
   return tempJucerPath;
 }
