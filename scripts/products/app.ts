@@ -34,6 +34,7 @@ const paths = {
     versionHeader: path.join(PLUGIN_ROOT, 'Source/version.h'),
     flutterApp: APP_ROOT,
     pubspecYaml: path.join(APP_ROOT, 'pubspec.yaml'),
+    pubspecLock: path.join(APP_ROOT, 'pubspec.lock'),
     xcode: {
         plugin: { project: path.join(XCODE_BUILD_ROOT, 'dbdone.xcodeproj'), scheme: 'dbdone - All', config: 'Release' },
         app: { workspace: path.join(APP_ROOT, 'macos/Runner.xcworkspace'), scheme: 'Runner' }
@@ -79,14 +80,18 @@ export async function buildApp(logger: Logger, args: AppArgs) {
 
             // Build Flutter app
             const pubspecBackup = paths.pubspecYaml + '.backup';
+            const pubspecLockBackup = paths.pubspecLock + '.backup';
             try {
                 await pipeline([
                     ['Patch Flutter pubspec.yaml version', async () => {
                         // Convert version format: 1.2.3-4 -> 1.2.3+4 (Flutter format)
                         const pubspecVersion = version.version.replace(/^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$/, '$1+$2');
 
-                        // Create backup before patching
+                        // Create backups before patching
                         await fs.copy(paths.pubspecYaml, pubspecBackup);
+                        if (await fs.pathExists(paths.pubspecLock)) {
+                            await fs.copy(paths.pubspecLock, pubspecLockBackup);
+                        }
 
                         const pubspecContent = await fs.readFile(paths.pubspecYaml, 'utf-8');
                         const patchedContent = pubspecContent.replace(/^(version:\s*).*/m, `$1${pubspecVersion}`);
@@ -210,10 +215,14 @@ export async function buildApp(logger: Logger, args: AppArgs) {
                     }]
                 ], logger);
             } finally {
-                // Restore original pubspec.yaml from backup
+                // Restore original pubspec.yaml and pubspec.lock from backups
                 if (await fs.pathExists(pubspecBackup)) {
                     await fs.copy(pubspecBackup, paths.pubspecYaml);
                     await fs.remove(pubspecBackup);
+                }
+                if (await fs.pathExists(pubspecLockBackup)) {
+                    await fs.copy(pubspecLockBackup, paths.pubspecLock);
+                    await fs.remove(pubspecLockBackup);
                 }
             }
 
