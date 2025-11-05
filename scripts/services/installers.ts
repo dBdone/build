@@ -3,8 +3,9 @@ import { fromBuild } from '../utils/root.js';
 import { sh } from './exec.js';
 import path from 'node:path';
 import fs from 'fs-extra';
+import { signWindowsExecutable } from './codesign_windows.js';
 
-export async function buildInnoSetup(issPath: string, version: string, stagingDir: string) {
+export async function buildInnoSetup(issPath: string, version: string, stagingDir: string, sign: boolean = false) {
   const iscc = requireEnv('ISCC_EXE');
   const installerRoot = fromBuild('installer');
   const termsRtf = path.join(installerRoot, 'terms-of-service.rtf');
@@ -19,12 +20,41 @@ export async function buildInnoSetup(issPath: string, version: string, stagingDi
   // Patch version
   issContent = issContent.replace(/^AppVersion=.*/m, `AppVersion=${version}`);
 
-  // Write to a temporary .iss file in the staging area
-  const tempIss = path.join(stagingDir, path.basename(issPath));
+  // Determine where to write the temp .iss file
+  // If stagingDir is empty/not provided, create temp file next to original
+  const tempIss = stagingDir 
+    ? path.join(stagingDir, path.basename(issPath))
+    : issPath + '.tmp';
+  
   await fs.writeFile(tempIss, issContent, 'utf-8');
 
-  // Run Inno Setup compiler
-  await sh(iscc, [tempIss]);
+  // Extract OutputDir and OutputBaseFilename from .iss to determine the installer path
+  const outputDirMatch = issContent.match(/^OutputDir=(.*)$/m);
+  const outputBaseFilenameMatch = issContent.match(/^OutputBaseFilename="?([^"\r\n]+)"?$/m);
+  
+  if (!outputDirMatch || !outputBaseFilenameMatch) {
+    throw new Error('Could not find OutputDir or OutputBaseFilename in .iss file');
+  }
+
+  const issDir = path.dirname(issPath);
+  const outputDir = path.resolve(issDir, outputDirMatch[1].trim());
+  const installerName = outputBaseFilenameMatch[1].trim();
+  const installerPath = path.join(outputDir, `${installerName}.exe`);
+
+  try {
+    // Run Inno Setup compiler
+    await sh(iscc, [tempIss]);
+    
+    // Sign the installer if requested
+    if (sign) {
+      await signWindowsExecutable(installerPath);
+    }
+  } finally {
+    // Clean up temp file if we created it next to the original
+    if (!stagingDir && tempIss !== issPath) {
+      await fs.remove(tempIss);
+    }
+  }
 }
 
 export async function productbuild(

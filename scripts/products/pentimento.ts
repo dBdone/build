@@ -181,7 +181,7 @@ export async function buildPentimento(logger: Logger, args: PentimentoArgs) {
         }],
         ['Build Inno Setup', async () => {
           const stage = path.join(paths.dist, 'win-payload');
-          await buildInnoSetup(paths.iss, version.version, stage);
+          await buildInnoSetup(paths.iss, version.version, stage, true);
         }],
       ], logger);
 

@@ -44,7 +44,7 @@ const paths = {
     pkg: fromBuild('dist', 'app', 'dBdone.pkg'),
     symbols: fromBuild('symbols'),
     archive: fromBuild('archive'),
-    iss: path.join(APP_INSTALLER_ROOT, 'windows', 'app.iss'),
+    iss: path.join(APP_INSTALLER_ROOT, 'windows', 'dbdone.iss'),
 };
 
 export async function buildApp(logger: Logger, args: AppArgs) {
@@ -244,8 +244,95 @@ export async function buildApp(logger: Logger, args: AppArgs) {
             }
 
         } else { // Windows
-            // TODO: Implement Windows build for app
-            throw new Error('Windows build for app not yet implemented');
+            // Build Flutter app
+            const pubspecBackup = paths.pubspecYaml + '.backup';
+            const pubspecLockBackup = paths.pubspecLock + '.backup';
+            const hadPubspecLock = await fs.pathExists(paths.pubspecLock);
+            try {
+                // Create backups before any mutation so we can reliably restore later
+                await fs.copy(paths.pubspecYaml, pubspecBackup);
+                if (hadPubspecLock) await fs.copy(paths.pubspecLock, pubspecLockBackup);
+
+                await pipeline([
+                    ['Patch Flutter pubspec.yaml version', async () => {
+                        // Convert version format: 1.2.3-4 -> 1.2.3+4 (Flutter format)
+                        const pubspecVersion = version.version.replace(/^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$/, '$1+$2');
+
+                        const pubspecContent = await fs.readFile(paths.pubspecYaml, 'utf-8');
+                        const patchedContent = pubspecContent.replace(/^(version:\s*).*/m, `$1${pubspecVersion}`);
+                        await fs.writeFile(paths.pubspecYaml, patchedContent, 'utf-8');
+                    }],
+                    ['Flutter clean', async () => {
+                        await sh('flutter', ['clean'], { cwd: paths.flutterApp });
+                    }],
+                    ['Flutter build windows', async () => {
+                        await fs.emptyDir(paths.symbols);
+                        await sh('flutter', ['build', 'windows', '--obfuscate', `--split-debug-info=${paths.symbols}`, '--tree-shake-icons'], { cwd: paths.flutterApp });
+                    }],
+                ], logger);
+
+                // Build dbdone plugin
+                await runTask('MSBuild dbdone plugin (VST3/AAX)', async () => {
+                    const { msbuild } = await import('../services/msbuild.js');
+                    await msbuild(paths.msvc.solution, paths.msvc.config);
+                }, { logger });
+
+                // Sign AAX plugin
+                await runTask('Sign AAX plugin (win)', async () => {
+                    const aaxPath = path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/dbdone.aaxplugin/Contents/x64/dbdone.aaxplugin');
+                    await signAAXPlugin({ pluginPath: aaxPath });
+                }, { logger });
+
+                // Build installer
+                await pipeline([
+                    ['Build Inno Setup installer', async () => {
+                        await buildInnoSetup(paths.iss, version.version, '', true);
+                    }],
+                    ['Archive debug symbols', async () => {
+                        const archiveDir = path.join(paths.archive, 'app');
+                        const archiveName = `symbols_${version.version}.zip`;
+                        const archivePath = path.join(archiveDir, archiveName);
+
+                        await fs.ensureDir(archiveDir);
+                        
+                        // Use PowerShell Compress-Archive for Windows
+                        await sh('powershell', [
+                            '-Command',
+                            `Compress-Archive -Path '${paths.symbols}\\*' -DestinationPath '${archivePath}' -Force`
+                        ]);
+                        
+                        await fs.emptyDir(paths.symbols);
+                    }],
+                ], logger);
+            } finally {
+                // Restore original pubspec.yaml from backup if present
+                if (await fs.pathExists(pubspecBackup)) {
+                    await fs.copy(pubspecBackup, paths.pubspecYaml);
+                    await fs.remove(pubspecBackup);
+                }
+
+                // Restore or clean up pubspec.lock depending on whether it existed originally
+                if (hadPubspecLock) {
+                    if (await fs.pathExists(pubspecLockBackup)) {
+                        await fs.copy(pubspecLockBackup, paths.pubspecLock);
+                        await fs.remove(pubspecLockBackup);
+                    }
+                } else {
+                    // If there was no lock originally, remove any lock produced by the build to avoid accidental commits
+                    if (await fs.pathExists(paths.pubspecLock)) {
+                        await fs.remove(paths.pubspecLock);
+                    }
+                }
+            }
+
+            if (args.deploy) {
+                const exe = path.join(paths.dist, 'dBdone Installer.exe');
+                const storageFid = `dBdone-${version.version}.exe`;
+                await pipeline([
+                    ['Upload to Supabase', () => uploadToSupabase(exe, 'shop/installers', storageFid)],
+                    ['Upsert DB row', () => upsertInstallerRow(version.version, APP_PRODUCT_TAG, 'win', storageFid)],
+                ], logger);
+            }
         }
 
         logger.info('App build finished', { platform: args.platform, version: version.version });
