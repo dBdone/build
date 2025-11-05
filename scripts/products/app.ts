@@ -21,7 +21,7 @@ export interface AppArgs {
     skipNotarize?: boolean;            // for local dry builds
 }
 
-const APP_PRODUCT_TAG = 'app';
+const APP_PRODUCT_TAG = 'dbd-app';
 const APP_ROOT = fromNative('app');
 const PLUGIN_ROOT = fromNative('plugins', 'dbdone');
 const XCODE_BUILD_ROOT = path.join(PLUGIN_ROOT, 'Builds/MacOSX/');
@@ -294,13 +294,13 @@ export async function buildApp(logger: Logger, args: AppArgs) {
                         const archivePath = path.join(archiveDir, archiveName);
 
                         await fs.ensureDir(archiveDir);
-                        
+
                         // Use PowerShell Compress-Archive for Windows
                         await sh('powershell', [
                             '-Command',
                             `Compress-Archive -Path '${paths.symbols}\\*' -DestinationPath '${archivePath}' -Force`
                         ]);
-                        
+
                         await fs.emptyDir(paths.symbols);
                     }],
                 ], logger);
