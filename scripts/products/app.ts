@@ -81,17 +81,16 @@ export async function buildApp(logger: Logger, args: AppArgs) {
             // Build Flutter app
             const pubspecBackup = paths.pubspecYaml + '.backup';
             const pubspecLockBackup = paths.pubspecLock + '.backup';
+            const hadPubspecLock = await fs.pathExists(paths.pubspecLock);
             try {
+                // Create backups before any mutation so we can reliably restore later
+                await fs.copy(paths.pubspecYaml, pubspecBackup);
+                if (hadPubspecLock) await fs.copy(paths.pubspecLock, pubspecLockBackup);
+
                 await pipeline([
                     ['Patch Flutter pubspec.yaml version', async () => {
                         // Convert version format: 1.2.3-4 -> 1.2.3+4 (Flutter format)
                         const pubspecVersion = version.version.replace(/^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$/, '$1+$2');
-
-                        // Create backups before patching
-                        await fs.copy(paths.pubspecYaml, pubspecBackup);
-                        if (await fs.pathExists(paths.pubspecLock)) {
-                            await fs.copy(paths.pubspecLock, pubspecLockBackup);
-                        }
 
                         const pubspecContent = await fs.readFile(paths.pubspecYaml, 'utf-8');
                         const patchedContent = pubspecContent.replace(/^(version:\s*).*/m, `$1${pubspecVersion}`);
@@ -199,10 +198,11 @@ export async function buildApp(logger: Logger, args: AppArgs) {
                     }],
                     ['Archive debug symbols', async () => {
                         const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0].replace('T', '-');
+                        const archiveDir = path.join(paths.archive, 'app');
                         const archiveName = `dSYMs_${version.version}.zip`;
-                        const archivePath = path.join(paths.archive, archiveName);
+                        const archivePath = path.join(archiveDir, archiveName);
 
-                        await fs.ensureDir(paths.archive);
+                        await fs.ensureDir(archiveDir);
                         await sh('ditto', ['-c', '-k', '--keepParent', paths.symbols, archivePath]);
                         await fs.emptyDir(paths.symbols);
                     }],
@@ -215,14 +215,23 @@ export async function buildApp(logger: Logger, args: AppArgs) {
                     }]
                 ], logger);
             } finally {
-                // Restore original pubspec.yaml and pubspec.lock from backups
+                // Restore original pubspec.yaml from backup if present
                 if (await fs.pathExists(pubspecBackup)) {
                     await fs.copy(pubspecBackup, paths.pubspecYaml);
                     await fs.remove(pubspecBackup);
                 }
-                if (await fs.pathExists(pubspecLockBackup)) {
-                    await fs.copy(pubspecLockBackup, paths.pubspecLock);
-                    await fs.remove(pubspecLockBackup);
+
+                // Restore or clean up pubspec.lock depending on whether it existed originally
+                if (hadPubspecLock) {
+                    if (await fs.pathExists(pubspecLockBackup)) {
+                        await fs.copy(pubspecLockBackup, paths.pubspecLock);
+                        await fs.remove(pubspecLockBackup);
+                    }
+                } else {
+                    // If there was no lock originally, remove any lock produced by the build to avoid accidental commits
+                    if (await fs.pathExists(paths.pubspecLock)) {
+                        await fs.remove(paths.pubspecLock);
+                    }
                 }
             }
 
