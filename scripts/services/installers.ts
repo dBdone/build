@@ -36,8 +36,9 @@ export async function buildInnoSetup(issPath: string, version: string, stagingDi
     throw new Error('Could not find OutputDir or OutputBaseFilename in .iss file');
   }
 
-  const issDir = path.dirname(issPath);
-  const outputDir = path.resolve(issDir, outputDirMatch[1].trim());
+  // Resolve OutputDir relative to where the temp .iss file will be (not the original)
+  const tempIssDir = path.dirname(tempIss);
+  const outputDir = path.resolve(tempIssDir, outputDirMatch[1].trim());
   const installerName = outputBaseFilenameMatch[1].trim();
   const installerPath = path.join(outputDir, `${installerName}.exe`);
 
