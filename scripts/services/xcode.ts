@@ -17,7 +17,7 @@ export async function xcodeClean(project: string, scheme: string, configuration:
   await sh('xcodebuild', cleanArgs);
 }
 
-export async function xcodeBuild(project: string, scheme: string, configuration: string) {
+export async function xcodeBuild(project: string, scheme: string, configuration: string, additionalSettings?: string[]) {
   // Run a clean first to ensure no stale artifacts
   await xcodeClean(project, scheme, configuration);
 
@@ -38,6 +38,11 @@ export async function xcodeBuild(project: string, scheme: string, configuration:
     'build',
     '-quiet',
   ];
+
+  // Add any additional build settings (e.g., STRIP_INSTALLED_PRODUCT=NO)
+  if (additionalSettings) {
+    buildArgs.push(...additionalSettings);
+  }
 
   return await sh('xcodebuild', buildArgs);
 }

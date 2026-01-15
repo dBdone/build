@@ -12,6 +12,7 @@ import { notarizeAndStaple, setupSigningKeychain } from '../services/notarize.js
 import { uploadToSupabase, upsertInstallerRow } from '../services/supabase.js';
 import { buildBackendLib } from '../services/backendlib.js';
 import { signAAXPlugin, removeInstalledAAXPlugin } from '../services/aax_signing.js';
+import { sh } from '../services/exec.js';
 
 export interface PentimentoArgs {
   platform: 'mac' | 'win';
@@ -37,6 +38,8 @@ const paths = {
   dist: fromBuild('dist', 'pentimento'),
   pkg: fromBuild('dist', 'pentimento', 'Pentimento.pkg'),
   iss: path.join(PENTI_INSTALLER_ROOT, 'windows', 'pentimento.iss'),
+  symbols: fromBuild('symbols'),
+  archive: fromBuild('archive'),
 };
 
 export async function buildPentimento(logger: Logger, args: PentimentoArgs) {
@@ -70,8 +73,33 @@ export async function buildPentimento(logger: Logger, args: PentimentoArgs) {
       // Setup signing keychain with certificates and notary credentials
       await runTask('Setup signing keychain', () => setupSigningKeychain(), { logger });
 
+      // Build plugins (symbols will be stripped from binaries but dSYMs will be generated)
       await runTask('Xcode build (AU/VST3/AAX)', () =>
-        xcodeBuild(paths.xcode.project, paths.xcode.scheme, paths.xcode.config), { logger });
+        xcodeBuild(
+          paths.xcode.project,
+          paths.xcode.scheme,
+          paths.xcode.config,
+          ['DEBUG_INFORMATION_FORMAT=dwarf-with-dsym']  // Generate dSYM files
+        ), { logger });
+
+      // Extract debug symbols using dsymutil
+      await runTask('Extract debug symbols (dSYMs)', async () => {
+        await fs.emptyDir(paths.symbols);
+
+        const builtPlugins = [
+          path.join(XCODE_BUILD_ROOT, 'build/Release/Pentimento.vst3/Contents/MacOS/Pentimento'),
+          path.join(XCODE_BUILD_ROOT, 'build/Release/Pentimento.component/Contents/MacOS/Pentimento'),
+          path.join(XCODE_BUILD_ROOT, 'build/Release/Pentimento.aaxplugin/Contents/MacOS/Pentimento'),
+        ];
+
+        for (const pluginBinary of builtPlugins) {
+          if (await fs.pathExists(pluginBinary)) {
+            const dsymName = path.basename(pluginBinary) + '.dSYM';
+            const dsymOutput = path.join(paths.symbols, dsymName);
+            await sh('dsymutil', [pluginBinary, '-o', dsymOutput]);
+          }
+        }
+      }, { logger });
 
       // Sign AAX plugin produced by Xcode (post-build)
       await runTask('Sign AAX plugin (mac)', async () => {
@@ -145,6 +173,15 @@ export async function buildPentimento(logger: Logger, args: PentimentoArgs) {
           const signIdentity = process.env.MACOS_INSTALLER_SIGN_ID;
           return productbuild(distXml, pkgDir, paths.pkg, resources, signIdentity, version.version);
         }],
+        ['Archive debug symbols', async () => {
+          const archiveDir = path.join(paths.archive, 'pentimento');
+          const archiveName = `dSYMs_${version.version}.zip`;
+          const archivePath = path.join(archiveDir, archiveName);
+
+          await fs.ensureDir(archiveDir);
+          await sh('ditto', ['-c', '-k', '--keepParent', paths.symbols, archivePath]);
+          await fs.emptyDir(paths.symbols);
+        }],
         ['Notarize + staple', async () => {
           if (args.skipNotarize) return;
           await notarizeAndStaple(paths.pkg);
@@ -182,6 +219,35 @@ export async function buildPentimento(logger: Logger, args: PentimentoArgs) {
         ['Build Inno Setup', async () => {
           const stage = path.join(paths.dist, 'win-payload');
           await buildInnoSetup(paths.iss, version.version, stage, true);
+        }],
+        ['Archive debug symbols', async () => {
+          const archiveDir = path.join(paths.archive, 'pentimento');
+          const archiveName = `symbols_${version.version}.zip`;
+          const archivePath = path.join(archiveDir, archiveName);
+
+          await fs.ensureDir(archiveDir);
+          await fs.emptyDir(paths.symbols);
+
+          // Collect PDB files from the build output
+          const pdbSources = [
+            path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Pentimento.vst3/Contents/x86_64-win/Pentimento.pdb'),
+            path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Pentimento.aaxplugin/Contents/x64/Pentimento.pdb'),
+          ];
+
+          for (const pdbPath of pdbSources) {
+            if (await fs.pathExists(pdbPath)) {
+              const pdbName = path.basename(pdbPath);
+              await fs.copy(pdbPath, path.join(paths.symbols, pdbName));
+            }
+          }
+
+          // Use PowerShell Compress-Archive for Windows
+          await sh('powershell', [
+            '-Command',
+            `Compress-Archive -Path '${paths.symbols}\\*' -DestinationPath '${archivePath}' -Force`
+          ]);
+
+          await fs.emptyDir(paths.symbols);
         }],
       ], logger);
 
