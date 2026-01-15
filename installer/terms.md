@@ -1,4 +1,4 @@
-Last update: 29. September 2025
+Last update: 14. January 2026
 
 ## 1. Scope of application
 
