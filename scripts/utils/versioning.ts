@@ -50,19 +50,17 @@ export async function computeVersion(mode: VersionMode, fallbackWorking = '9.9.9
   const m = /^(\d+)\.(\d+)\.(\d+)[-+](\d+)$/.exec(versionStr);
   if (!m) throw new Error(`Bad tag format: ${latestTag} (extracted: ${versionStr}). Expected format: ${productPrefix || ''}X.Y.Z-N or ${productPrefix || ''}X.Y.Z+N`);
   
-  // Get commit count since this tag
-  const count = (await gitInNative('rev-list', `${latestTag}..HEAD`, '--count')).stdout.trim();
-  const commitsSinceTag = Number(count);
-  const totalBuild = Number(m[4]) + commitsSinceTag;
+  // Use the exact version from the tag
+  const buildNumber = Number(m[4]);
   
   return {
     mode, 
     tag: latestTag,
-    version: `${m[1]}.${m[2]}.${m[3]}-${totalBuild}`,
+    version: `${m[1]}.${m[2]}.${m[3]}-${buildNumber}`,
     major: +m[1], 
     minor: +m[2], 
     patch: +m[3], 
-    build: totalBuild,
+    build: buildNumber,
   };
 }
 

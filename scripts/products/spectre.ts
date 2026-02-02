@@ -12,6 +12,7 @@ import { notarizeAndStaple, setupSigningKeychain } from '../services/notarize.js
 import { uploadToSupabase, upsertInstallerRow } from '../services/supabase.js';
 import { buildBackendLib } from '../services/backendlib.js';
 import { signAAXPlugin, removeInstalledAAXPlugin } from '../services/aax_signing.js';
+import { signWindowsExecutable } from '../services/codesign_windows.js';
 import { sh } from '../services/exec.js';
 
 export interface SpectreArgs {
@@ -193,6 +194,14 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
                 ['Sign AAX plugin', async () => {
                     const aaxPath = path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Spectre.aaxplugin/Contents/x64/Spectre.aaxplugin');
                     await signAAXPlugin({ pluginPath: aaxPath });
+                }],
+                ['Sign VST3 plugin', async () => {
+                    const vst3Path = path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Spectre.vst3/Contents/x86_64-win/Spectre.vst3');
+                    await signWindowsExecutable(vst3Path);
+                }],
+                ['Sign backend DLL', async () => {
+                    const backendDll = fromNative('components/dbDoneBackend/Builds/VisualStudio2022/x64/Release/Dynamic Library/dbdone_backend.dll');
+                    await signWindowsExecutable(backendDll);
                 }],
                 ['Stage content', async () => {
                     const stage = path.join(paths.dist, 'win-payload');

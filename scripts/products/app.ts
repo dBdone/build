@@ -11,6 +11,7 @@ import { notarizeAndStaple, setupSigningKeychain } from '../services/notarize.js
 import { uploadToSupabase, upsertInstallerRow } from '../services/supabase.js';
 import { buildBackendLib } from '../services/backendlib.js';
 import { signAAXPlugin, removeInstalledAAXPlugin } from '../services/aax_signing.js';
+import { signWindowsExecutable } from '../services/codesign_windows.js';
 import { sh } from '../services/exec.js';
 
 export interface AppArgs {
@@ -281,6 +282,32 @@ export async function buildApp(logger: Logger, args: AppArgs) {
                 await runTask('Sign AAX plugin (win)', async () => {
                     const aaxPath = path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/dbdone.aaxplugin/Contents/x64/dbdone.aaxplugin');
                     await signAAXPlugin({ pluginPath: aaxPath });
+                }, { logger });
+
+                // Sign VST3 plugin
+                await runTask('Sign VST3 plugin', async () => {
+                    const vst3Path = path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/dbdone.vst3/Contents/x86_64-win/dbdone.vst3');
+                    await signWindowsExecutable(vst3Path);
+                }, { logger });
+
+                // Sign backend DLL
+                await runTask('Sign backend DLL', async () => {
+                    const backendDll = fromNative('components/dbDoneBackend/Builds/VisualStudio2022/x64/Release/Dynamic Library/dbdone_backend.dll');
+                    await signWindowsExecutable(backendDll);
+                }, { logger });
+
+                // Sign Flutter binaries (runner exe and DLLs)
+                await runTask('Sign Flutter binaries', async () => {
+                    const flutterBuildDir = fromNative('app/build/windows/x64/runner/Release');
+                    
+                    // Find all .exe and .dll files in the Flutter build directory
+                    const files = await fs.readdir(flutterBuildDir);
+                    const binaries = files.filter(f => f.endsWith('.exe') || f.endsWith('.dll'));
+                    
+                    for (const binary of binaries) {
+                        const binaryPath = path.join(flutterBuildDir, binary);
+                        await signWindowsExecutable(binaryPath);
+                    }
                 }, { logger });
 
                 // Build installer

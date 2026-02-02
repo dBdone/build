@@ -19,6 +19,75 @@ export interface AAXSigningOptions {
   autoinstall?: boolean;    // Auto-install after signing (default: false)
 }
 
+
+export async function signAAXPlugin(options: AAXSigningOptions) {
+  const { pluginPath, autoinstall = false } = options;
+
+  const account = requireEnv('AAX_ACCOUNT');
+  const password = requireEnv('AAX_PASSWORD');
+  const wcguid = requireEnv('AAX_WCGUID');
+
+  const wraptoolExe = process.env['AAX_WRAPTOOL'] || 'wraptool';
+  const isWindows = process.platform === 'win32';
+
+  const tmpDir = fromBuild('tmp', 'aax-signing');
+  await fs.ensureDir(tmpDir);
+  const tmpOutput = path.join(tmpDir, path.basename(pluginPath));
+  if (await fs.pathExists(tmpOutput)) await fs.remove(tmpOutput);
+
+  const args: string[] = [
+    'sign',
+    '--verbose',
+    '--account', account,
+    '--password', password,
+    '--wcguid', wcguid,
+    '--in', path.resolve(pluginPath),
+    '--out', path.resolve(tmpOutput),
+  ];
+
+  if (isWindows) {
+    // Use the same EV thumbprint you already use with signtool /sha1
+    const certThumbprint = requireEnv('WINDOWS_CERT_SHA1');
+    const signtool = requireEnv('SIGNTOOL_EXE');
+
+    // IMPORTANT: --signid must be after "sign"
+    args.splice(1, 0, '--signid', certThumbprint);
+
+    // Tell wraptool exactly which signtool to call (helps a lot on CI boxes)
+    args.push('--signtool', signtool);
+
+    // Common wraptool option (seen in the wild)
+    args.push('--extrasigningoptions', 'digest_sha256');
+  } else {
+    // macOS: keep whatever you already had (Developer ID identity etc.)
+    const macSignId = process.env['AAX_MAC_SIGNID'];
+    const keyfile = requireEnv('AAX_KEYFILE');
+    const keypassword = requireEnv('AAX_KEYPASSWORD');
+
+    if (macSignId && macSignId.trim()) {
+      args.splice(1, 0, '--signid', macSignId.trim());
+    }
+
+    args.push(
+      '--keyfile', path.resolve(keyfile),
+      '--keypassword', keypassword
+    );
+  }
+
+  if (autoinstall) args.push('--autoinstall', 'on');
+
+  await sh(wraptoolExe, args);
+
+  await fs.move(tmpOutput, pluginPath, { overwrite: true });
+
+  // Verify right away (Windows)
+  if (isWindows) {
+    const signtool = requireEnv('SIGNTOOL_EXE');
+    await sh(signtool, ['verify', '/pa', '/v', '/tw', path.resolve(pluginPath)]);
+  }
+}
+
+/*
 export async function signAAXPlugin(options: AAXSigningOptions) {
   const {
     pluginPath,
@@ -73,3 +142,4 @@ export async function signAAXPlugin(options: AAXSigningOptions) {
   // Move signed plugin back to replace unsigned version
   await fs.move(tmpOutput, pluginPath, { overwrite: true });
 }
+*/
