@@ -4,7 +4,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { Logger } from './utils/logger.js';
 import { buildPentimento } from './products/pentimento.js';
-import { buildSpectre } from './products/spectre.js';
+import { buildGlas } from './products/glas.js';
 import { buildApp } from './products/app.js';
 
 const argv = yargs(hideBin(process.argv))
@@ -25,7 +25,7 @@ const argv = yargs(hideBin(process.argv))
         deploy: args.deploy, skipNotarize: args.skipNotarize
       });
     })
-  .command('spectre <action>', 'Build/package/deploy Spectre', (y) =>
+  .command('glas <action>', 'Build/package/deploy Glas', (y) =>
     y.positional('action', { choices: ['build'] as const })
       .option('platform', { choices: ['mac', 'win'] as const, demandOption: true })
       .option('mode', { choices: ['working', 'latest'] as const, default: 'working' as const })
@@ -35,7 +35,7 @@ const argv = yargs(hideBin(process.argv))
       .option('json', { type: 'boolean', default: false })
     , async (args) => {
       const logger = new Logger(!!args.json);
-      await buildSpectre(logger, {
+      await buildGlas(logger, {
         platform: args.platform, mode: args.mode as 'working' | 'latest', fakeVersion: args.fakeVersion,
         deploy: args.deploy, skipNotarize: args.skipNotarize
       });

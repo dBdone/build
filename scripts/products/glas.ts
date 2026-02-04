@@ -15,7 +15,7 @@ import { signAAXPlugin, removeInstalledAAXPlugin } from '../services/aax_signing
 import { signWindowsExecutable } from '../services/codesign_windows.js';
 import { sh } from '../services/exec.js';
 
-export interface SpectreArgs {
+export interface GlasArgs {
     platform: 'mac' | 'win';
     mode: VersionMode;                 // 'working' | 'latest'
     fakeVersion?: string;              // default "9.9.9-9" for working
@@ -23,30 +23,30 @@ export interface SpectreArgs {
     skipNotarize?: boolean;            // for local dry builds
 }
 
-const SPECTRE_PRODUCT_TAG = 'dbd-spectre';
-const SPECTRE_ROOT = fromNative('plugins', 'fx_plugins', 'spectre')
-const MSVC_BUILD_ROOT = path.join(SPECTRE_ROOT, 'Builds/VisualStudio2022/');
-const XCODE_BUILD_ROOT = path.join(SPECTRE_ROOT, 'Builds/MacOSX/');
+const GLAS_PRODUCT_TAG = 'dbd-glas';
+const GLAS_ROOT = fromNative('plugins', 'fx_plugins', 'glas')
+const MSVC_BUILD_ROOT = path.join(GLAS_ROOT, 'Builds/VisualStudio2022/');
+const XCODE_BUILD_ROOT = path.join(GLAS_ROOT, 'Builds/MacOSX/');
 const INSTALLER_ROOT = fromBuild('installer')
-const SPECTRE_INSTALLER_ROOT = path.join(INSTALLER_ROOT, 'spectre');
+const GLAS_INSTALLER_ROOT = path.join(INSTALLER_ROOT, 'glas');
 
 const paths = {
-    jucer: path.join(SPECTRE_ROOT, 'Spectre.jucer'),
-    versionHeader: path.join(SPECTRE_ROOT, 'Source/version.h'),
-    xcode: { project: path.join(XCODE_BUILD_ROOT, 'spectre.xcodeproj'), scheme: 'spectre - All', config: 'Release' },
-    msvc: { solution: path.join(MSVC_BUILD_ROOT, 'Spectre.sln'), config: 'Release' },
-    dist: fromBuild('dist', 'spectre'),
-    pkg: fromBuild('dist', 'spectre', 'Spectre.pkg'),
-    iss: path.join(SPECTRE_INSTALLER_ROOT, 'windows', 'spectre.iss'),
+    jucer: path.join(GLAS_ROOT, 'Glas.jucer'),
+    versionHeader: path.join(GLAS_ROOT, 'Source/version.h'),
+    xcode: { project: path.join(XCODE_BUILD_ROOT, 'glas.xcodeproj'), scheme: 'glas - All', config: 'Release' },
+    msvc: { solution: path.join(MSVC_BUILD_ROOT, 'Glas.sln'), config: 'Release' },
+    dist: fromBuild('dist', 'glas'),
+    pkg: fromBuild('dist', 'glas', 'Glas.pkg'),
+    iss: path.join(GLAS_INSTALLER_ROOT, 'windows', 'glas.iss'),
     symbols: fromBuild('symbols'),
     archive: fromBuild('archive'),
 };
 
-export async function buildSpectre(logger: Logger, args: SpectreArgs) {
+export async function buildGlas(logger: Logger, args: GlasArgs) {
     // Clear and ensure dist directory for clean build
     await fs.emptyDir(paths.dist);
 
-    const version: VersionInfo = await computeVersion(args.mode, args.fakeVersion ?? '9.9.9-9', 'SPECTRE_V');
+    const version: VersionInfo = await computeVersion(args.mode, args.fakeVersion ?? '9.9.9-9', 'GLAS_V');
     logger.info(`Version resolved`, version);
 
     // Checkout the version if in 'latest' mode
@@ -68,7 +68,7 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
 
         if (args.platform === 'mac') {
             // Remove existing AAX plugin from system (requires sudo)
-            await runTask('Remove installed AAX plugin', () => removeInstalledAAXPlugin('spectre'), { logger });
+            await runTask('Remove installed AAX plugin', () => removeInstalledAAXPlugin('glas'), { logger });
 
             // Setup signing keychain with certificates and notary credentials
             await runTask('Setup signing keychain', () => setupSigningKeychain(), { logger });
@@ -87,9 +87,9 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
                 await fs.emptyDir(paths.symbols);
 
                 const builtPlugins = [
-                    path.join(XCODE_BUILD_ROOT, 'build/Release/Spectre.vst3/Contents/MacOS/Spectre'),
-                    path.join(XCODE_BUILD_ROOT, 'build/Release/Spectre.component/Contents/MacOS/Spectre'),
-                    path.join(XCODE_BUILD_ROOT, 'build/Release/Spectre.aaxplugin/Contents/MacOS/Spectre'),
+                    path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.vst3/Contents/MacOS/Glas'),
+                    path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.component/Contents/MacOS/Glas'),
+                    path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.aaxplugin/Contents/MacOS/Glas'),
                 ];
 
                 for (const pluginBinary of builtPlugins) {
@@ -103,7 +103,7 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
 
             // Sign AAX plugin produced by Xcode (post-build)
             await runTask('Sign AAX plugin (mac)', async () => {
-                const aaxBuilt = path.join(XCODE_BUILD_ROOT, 'build/Release/Spectre.aaxplugin');
+                const aaxBuilt = path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.aaxplugin');
                 // signAAXPlugin will replace the plugin at the given path with a signed version
                 await signAAXPlugin({ pluginPath: aaxBuilt });
             }, { logger });
@@ -114,40 +114,40 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
                 ['Build macOS packages', async () => {
                     const backendLibPath = fromNative('components/dbDoneBackend/Builds/MacOSX/build/Release/dbdone_backend.dylib');
 
-                    // Define package specifications (no packs for spectre)
+                    // Define package specifications (no packs for glas)
                     const packages: MacPackageSpec[] = [
                         {
-                            identifier: 'com.dbdone.spectrevst.pkg',
-                            filename: 'spectreVST.pkg',
+                            identifier: 'com.dbdone.glasvst.pkg',
+                            filename: 'glasVST.pkg',
                             stage: async (root) => {
-                                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'VST3', 'Spectre.vst3');
+                                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'VST3', 'Glas.vst3');
                                 await fs.ensureDir(path.dirname(target));
-                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Spectre.vst3'), target);
+                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.vst3'), target);
                             }
                         },
                         {
-                            identifier: 'com.dbdone.spectreau.pkg',
-                            filename: 'spectreAU.pkg',
+                            identifier: 'com.dbdone.glasau.pkg',
+                            filename: 'glasAU.pkg',
                             stage: async (root) => {
-                                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'Components', 'Spectre.component');
+                                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'Components', 'Glas.component');
                                 await fs.ensureDir(path.dirname(target));
-                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Spectre.component'), target);
+                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.component'), target);
                             }
                         },
                         {
-                            identifier: 'com.dbdone.spectreaax.pkg',
-                            filename: 'spectreAAX.pkg',
+                            identifier: 'com.dbdone.glasaax.pkg',
+                            filename: 'glasAAX.pkg',
                             stage: async (root) => {
-                                const target = path.join(root, 'Library', 'Application Support', 'Avid', 'Audio', 'Plug-Ins', 'Spectre.aaxplugin');
+                                const target = path.join(root, 'Library', 'Application Support', 'Avid', 'Audio', 'Plug-Ins', 'Glas.aaxplugin');
                                 await fs.ensureDir(path.dirname(target));
-                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Spectre.aaxplugin'), target);
+                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.aaxplugin'), target);
                             }
                         },
                         {
-                            identifier: 'com.dbdone.spectrebasic.pkg',
-                            filename: 'spectreBASIC.pkg',
+                            identifier: 'com.dbdone.glasbasic.pkg',
+                            filename: 'glasBASIC.pkg',
                             stage: async (root) => {
-                                const target = path.join(root, 'Library', 'Application Support', 'com.dbdone.spectre', 'dbdone_backend.dylib');
+                                const target = path.join(root, 'Library', 'Application Support', 'com.dbdone.glas', 'dbdone_backend.dylib');
                                 await fs.ensureDir(path.dirname(target));
                                 await fs.copy(backendLibPath, target);
                             }
@@ -157,14 +157,14 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
                     await buildMacPackages(packages, version.version, paths.dist);
                 }],
                 ['productbuild', () => {
-                    const distXml = path.join(SPECTRE_INSTALLER_ROOT, 'macOS', 'distribution_spectre.xml');
+                    const distXml = path.join(GLAS_INSTALLER_ROOT, 'macOS', 'distribution_glas.xml');
                     const pkgDir = path.join(paths.dist, 'packages');
                     const resources = fromBuild('macOS', 'installer', 'resources');
                     const signIdentity = process.env.MACOS_INSTALLER_SIGN_ID;
                     return productbuild(distXml, pkgDir, paths.pkg, resources, signIdentity, version.version);
                 }],
                 ['Archive debug symbols', async () => {
-                    const archiveDir = path.join(paths.archive, 'spectre');
+                    const archiveDir = path.join(paths.archive, 'glas');
                     const archiveName = `dSYMs_${version.version}.zip`;
                     const archivePath = path.join(archiveDir, archiveName);
 
@@ -179,10 +179,10 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
             ], logger);
 
             if (args.deploy) {
-                const storageFid = `Spectre-${version.version}.pkg`;
+                const storageFid = `Glas-${version.version}.pkg`;
                 await pipeline([
                     ['Upload to Supabase', () => uploadToSupabase(paths.pkg, 'shop/installers', storageFid)],
-                    ['Upsert DB row', () => upsertInstallerRow(version.version, SPECTRE_PRODUCT_TAG, 'mac', storageFid)],
+                    ['Upsert DB row', () => upsertInstallerRow(version.version, GLAS_PRODUCT_TAG, 'mac', storageFid)],
                 ], logger);
             }
 
@@ -192,11 +192,11 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
 
             await pipeline([
                 ['Sign AAX plugin', async () => {
-                    const aaxPath = path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Spectre.aaxplugin/Contents/x64/Spectre.aaxplugin');
+                    const aaxPath = path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Glas.aaxplugin/Contents/x64/Glas.aaxplugin');
                     await signAAXPlugin({ pluginPath: aaxPath });
                 }],
                 ['Sign VST3 plugin', async () => {
-                    const vst3Path = path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Spectre.vst3/Contents/x86_64-win/Spectre.vst3');
+                    const vst3Path = path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Glas.vst3/Contents/x86_64-win/Glas.vst3');
                     await signWindowsExecutable(vst3Path);
                 }],
                 ['Sign backend DLL', async () => {
@@ -206,8 +206,8 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
                 ['Stage content', async () => {
                     const stage = path.join(paths.dist, 'win-payload');
                     await fs.emptyDir(stage);
-                    await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Spectre.vst3'), path.join(stage, 'VST3/Spectre.vst3'));
-                    await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Spectre.aaxplugin'), path.join(stage, 'AAX/Spectre.aaxplugin'));
+                    await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Glas.vst3'), path.join(stage, 'VST3/Glas.vst3'));
+                    await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Glas.aaxplugin'), path.join(stage, 'AAX/Glas.aaxplugin'));
 
                     // Copy backend DLL
                     const backendDll = fromNative('components/dbDoneBackend/Builds/VisualStudio2022/x64/Release/Dynamic Library/dbdone_backend.dll');
@@ -218,7 +218,7 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
                     await buildInnoSetup(paths.iss, version.version, stage, true);
                 }],
                 ['Archive debug symbols', async () => {
-                    const archiveDir = path.join(paths.archive, 'spectre');
+                    const archiveDir = path.join(paths.archive, 'glas');
                     const archiveName = `symbols_${version.version}.zip`;
                     const archivePath = path.join(archiveDir, archiveName);
 
@@ -227,8 +227,8 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
 
                     // Collect PDB files from the build output
                     const pdbSources = [
-                        path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Spectre.vst3/Contents/x86_64-win/Spectre.pdb'),
-                        path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Spectre.aaxplugin/Contents/x64/Spectre.pdb'),
+                        path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Glas.vst3/Contents/x86_64-win/Glas.pdb'),
+                        path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Glas.aaxplugin/Contents/x64/Glas.pdb'),
                     ];
 
                     for (const pdbPath of pdbSources) {
@@ -249,16 +249,16 @@ export async function buildSpectre(logger: Logger, args: SpectreArgs) {
             ], logger);
 
             if (args.deploy) {
-                const exe = path.join(paths.dist, 'Spectre Installer.exe');
-                const storageFid = `Spectre-${version.version}.exe`;
+                const exe = path.join(paths.dist, 'Glas Installer.exe');
+                const storageFid = `Glas-${version.version}.exe`;
                 await pipeline([
                     ['Upload to Supabase', () => uploadToSupabase(exe, 'shop/installers', storageFid)],
-                    ['Upsert DB row', () => upsertInstallerRow(version.version, SPECTRE_PRODUCT_TAG, 'win', storageFid)],
+                    ['Upsert DB row', () => upsertInstallerRow(version.version, GLAS_PRODUCT_TAG, 'win', storageFid)],
                 ], logger);
             }
         }
 
-        logger.info('Spectre finished', { platform: args.platform, version: version.version });
+        logger.info('Glas finished', { platform: args.platform, version: version.version });
     } finally {
         // Restore git state if we checked out a tag
         await restoreGit();

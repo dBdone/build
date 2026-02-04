@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>Glas Version 9.9.9+99</title>
+    <license file="terms-of-service.html"/>
+
+    <pkg-ref id="com.dbdone.glasvst.pkg" version="0" onConclusion="none">glasVST.pkg</pkg-ref>
+    <pkg-ref id="com.dbdone.glasau.pkg" version="0" onConclusion="none">glasAU.pkg</pkg-ref>
+    <pkg-ref id="com.dbdone.glasaax.pkg" version="0" onConclusion="none">glasAAX.pkg</pkg-ref>
+
+    <pkg-ref id="com.dbdone.glasbasic.pkg" version="0" onConclusion="none">glasBASIC.pkg</pkg-ref>
+
+    <options customize="always" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <choices-outline>
+        <line choice="glasbasic"/>
+        <line choice="glasvst"/>
+        <line choice="glasau"/>
+        <line choice="glasaax"/>
+    </choices-outline>
+
+    <choice id="glasbasic"
+        title="Basic (required)"
+        selected="true"
+        enabled="false"
+        visible="false">
+        <pkg-ref id="com.dbdone.glasbasic.pkg"/>
+    </choice>
+
+    <choice id="glasvst" title="Glas Plugin (VST3)" visible="true">
+        <pkg-ref id="com.dbdone.glasvst.pkg"/>
+    </choice>
+    <choice id="glasau" title="Glas Plugin (AU)" visible="true">
+        <pkg-ref id="com.dbdone.glasau.pkg"/>
+    </choice>
+    <choice id="glasaax" title="Glas Plugin (AAX)" visible="true">
+        <pkg-ref id="com.dbdone.glasaax.pkg"/>
+    </choice>
+</installer-gui-script>
