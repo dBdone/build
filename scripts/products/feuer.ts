@@ -15,7 +15,7 @@ import { signAAXPlugin, removeInstalledAAXPlugin } from '../services/aax_signing
 import { signWindowsExecutable } from '../services/codesign_windows.js';
 import { sh } from '../services/exec.js';
 
-export interface GlasArgs {
+export interface FeuerArgs {
     platform: 'mac' | 'win';
     mode: VersionMode;                 // 'working' | 'latest'
     fakeVersion?: string;              // default "9.9.9-9" for working
@@ -23,31 +23,31 @@ export interface GlasArgs {
     skipNotarize?: boolean;            // for local dry builds
 }
 
-const GLAS_PRODUCT_TAG = 'dbd-glas';
-const GLAS_ROOT = fromNative('plugins', 'fx_plugins', 'glas')
-const MSVC_BUILD_ROOT = path.join(GLAS_ROOT, 'Builds/VisualStudio2022/');
-const XCODE_BUILD_ROOT = path.join(GLAS_ROOT, 'Builds/MacOSX/');
+const FEUER_PRODUCT_TAG = 'dbd-feuer';
+const FEUER_ROOT = fromNative('plugins', 'fx_plugins', 'feuer')
+const MSVC_BUILD_ROOT = path.join(FEUER_ROOT, 'Builds/VisualStudio2022/');
+const XCODE_BUILD_ROOT = path.join(FEUER_ROOT, 'Builds/MacOSX/');
 const INSTALLER_ROOT = fromBuild('installer')
-const GLAS_INSTALLER_ROOT = path.join(INSTALLER_ROOT, 'glas');
+const FEUER_INSTALLER_ROOT = path.join(INSTALLER_ROOT, 'feuer');
 
 const paths = {
-    jucer: path.join(GLAS_ROOT, 'Glas.jucer'),
-    versionHeader: path.join(GLAS_ROOT, 'Source/version.h'),
-    xcode: { project: path.join(XCODE_BUILD_ROOT, 'glas.xcodeproj'), scheme: 'glas - All', config: 'Release' },
-    msvc: { solution: path.join(MSVC_BUILD_ROOT, 'Glas.sln'), config: 'Release' },
-    contentDir: path.join(GLAS_INSTALLER_ROOT, 'shared'),
-    dist: fromBuild('dist', 'glas'),
-    pkg: fromBuild('dist', 'glas', 'Glas.pkg'),
-    iss: path.join(GLAS_INSTALLER_ROOT, 'windows', 'glas.iss'),
+    jucer: path.join(FEUER_ROOT, 'Feuer.jucer'),
+    versionHeader: path.join(FEUER_ROOT, 'Source/version.h'),
+    xcode: { project: path.join(XCODE_BUILD_ROOT, 'feuer.xcodeproj'), scheme: 'feuer - All', config: 'Release' },
+    msvc: { solution: path.join(MSVC_BUILD_ROOT, 'Feuer.sln'), config: 'Release' },
+    contentDir: path.join(FEUER_INSTALLER_ROOT, 'shared'),
+    dist: fromBuild('dist', 'feuer'),
+    pkg: fromBuild('dist', 'feuer', 'Feuer.pkg'),
+    iss: path.join(FEUER_INSTALLER_ROOT, 'windows', 'feuer.iss'),
     symbols: fromBuild('symbols'),
     archive: fromBuild('archive'),
 };
 
-export async function buildGlas(logger: Logger, args: GlasArgs) {
+export async function buildFeuer(logger: Logger, args: FeuerArgs) {
     // Clear and ensure dist directory for clean build
     await fs.emptyDir(paths.dist);
 
-    const version: VersionInfo = await computeVersion(args.mode, args.fakeVersion ?? '9.9.9-9', 'GLAS_V');
+    const version: VersionInfo = await computeVersion(args.mode, args.fakeVersion ?? '9.9.9-9', 'FEUER_V');
     logger.info(`Version resolved`, version);
 
     // Checkout the version if in 'latest' mode
@@ -68,7 +68,7 @@ export async function buildGlas(logger: Logger, args: GlasArgs) {
 
         if (args.platform === 'mac') {
             // Remove existing AAX plugin from system (requires sudo)
-            await runTask('Remove installed AAX plugin', () => removeInstalledAAXPlugin('glas'), { logger });
+            await runTask('Remove installed AAX plugin', () => removeInstalledAAXPlugin('feuer'), { logger });
 
             // Setup signing keychain with certificates and notary credentials
             await runTask('Setup signing keychain', () => setupSigningKeychain(), { logger });
@@ -87,9 +87,9 @@ export async function buildGlas(logger: Logger, args: GlasArgs) {
                 await fs.emptyDir(paths.symbols);
 
                 const builtPlugins = [
-                    path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.vst3/Contents/MacOS/Glas'),
-                    path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.component/Contents/MacOS/Glas'),
-                    path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.aaxplugin/Contents/MacOS/Glas'),
+                    path.join(XCODE_BUILD_ROOT, 'build/Release/Feuer.vst3/Contents/MacOS/Feuer'),
+                    path.join(XCODE_BUILD_ROOT, 'build/Release/Feuer.component/Contents/MacOS/Feuer'),
+                    path.join(XCODE_BUILD_ROOT, 'build/Release/Feuer.aaxplugin/Contents/MacOS/Feuer'),
                 ];
 
                 for (const pluginBinary of builtPlugins) {
@@ -103,7 +103,7 @@ export async function buildGlas(logger: Logger, args: GlasArgs) {
 
             // Sign AAX plugin produced by Xcode (post-build)
             await runTask('Sign AAX plugin (mac)', async () => {
-                const aaxBuilt = path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.aaxplugin');
+                const aaxBuilt = path.join(XCODE_BUILD_ROOT, 'build/Release/Feuer.aaxplugin');
                 // signAAXPlugin will replace the plugin at the given path with a signed version
                 await signAAXPlugin({ pluginPath: aaxBuilt });
             }, { logger });
@@ -117,37 +117,37 @@ export async function buildGlas(logger: Logger, args: GlasArgs) {
                     // Define package specifications
                     const packages: MacPackageSpec[] = [
                         {
-                            identifier: 'com.dbdone.glasvst.pkg',
-                            filename: 'glasVST.pkg',
+                            identifier: 'com.dbdone.feuervst.pkg',
+                            filename: 'feuerVST.pkg',
                             stage: async (root) => {
-                                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'VST3', 'Glas.vst3');
+                                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'VST3', 'Feuer.vst3');
                                 await fs.ensureDir(path.dirname(target));
-                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.vst3'), target);
+                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Feuer.vst3'), target);
                             }
                         },
                         {
-                            identifier: 'com.dbdone.glasau.pkg',
-                            filename: 'glasAU.pkg',
+                            identifier: 'com.dbdone.feuerau.pkg',
+                            filename: 'feuerAU.pkg',
                             stage: async (root) => {
-                                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'Components', 'Glas.component');
+                                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'Components', 'Feuer.component');
                                 await fs.ensureDir(path.dirname(target));
-                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.component'), target);
+                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Feuer.component'), target);
                             }
                         },
                         {
-                            identifier: 'com.dbdone.glasaax.pkg',
-                            filename: 'glasAAX.pkg',
+                            identifier: 'com.dbdone.feueraax.pkg',
+                            filename: 'feuerAAX.pkg',
                             stage: async (root) => {
-                                const target = path.join(root, 'Library', 'Application Support', 'Avid', 'Audio', 'Plug-Ins', 'Glas.aaxplugin');
+                                const target = path.join(root, 'Library', 'Application Support', 'Avid', 'Audio', 'Plug-Ins', 'Feuer.aaxplugin');
                                 await fs.ensureDir(path.dirname(target));
-                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Glas.aaxplugin'), target);
+                                await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Feuer.aaxplugin'), target);
                             }
                         },
                         {
-                            identifier: 'com.dbdone.glaspresets.pkg',
-                            filename: 'glasPRESETS.pkg',
+                            identifier: 'com.dbdone.feuerpresets.pkg',
+                            filename: 'feuerPRESETS.pkg',
                             stage: async (root) => {
-                                const target = path.join(root, 'Library', 'Application Support', 'com.dbdone.glas', 'presets');
+                                const target = path.join(root, 'Library', 'Application Support', 'com.dbdone.feuer', 'presets');
                                 await fs.ensureDir(target);
                                 await fs.copy(presetsSourceDir, target);
                             }
@@ -157,14 +157,14 @@ export async function buildGlas(logger: Logger, args: GlasArgs) {
                     await buildMacPackages(packages, version.version, paths.dist);
                 }],
                 ['productbuild', () => {
-                    const distXml = path.join(GLAS_INSTALLER_ROOT, 'macOS', 'distribution_glas.xml');
+                    const distXml = path.join(FEUER_INSTALLER_ROOT, 'macOS', 'distribution_feuer.xml');
                     const pkgDir = path.join(paths.dist, 'packages');
                     const resources = fromBuild('macOS', 'installer', 'resources');
                     const signIdentity = process.env.MACOS_INSTALLER_SIGN_ID;
                     return productbuild(distXml, pkgDir, paths.pkg, resources, signIdentity, version.version);
                 }],
                 ['Archive debug symbols', async () => {
-                    const archiveDir = path.join(paths.archive, 'glas');
+                    const archiveDir = path.join(paths.archive, 'feuer');
                     const archiveName = `dSYMs_${version.version}.zip`;
                     const archivePath = path.join(archiveDir, archiveName);
 
@@ -179,10 +179,10 @@ export async function buildGlas(logger: Logger, args: GlasArgs) {
             ], logger);
 
             if (args.deploy) {
-                const storageFid = `Glas-${version.version}.pkg`;
+                const storageFid = `Feuer-${version.version}.pkg`;
                 await pipeline([
                     ['Upload to Supabase', () => uploadToSupabase(paths.pkg, 'shop/installers', storageFid)],
-                    ['Upsert DB row', () => upsertInstallerRow(version.version, GLAS_PRODUCT_TAG, 'mac', storageFid)],
+                    ['Upsert DB row', () => upsertInstallerRow(version.version, FEUER_PRODUCT_TAG, 'mac', storageFid)],
                 ], logger);
             }
 
@@ -192,18 +192,18 @@ export async function buildGlas(logger: Logger, args: GlasArgs) {
 
             await pipeline([
                 ['Sign AAX plugin', async () => {
-                    const aaxPath = path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Glas.aaxplugin/Contents/x64/Glas.aaxplugin');
+                    const aaxPath = path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Feuer.aaxplugin/Contents/x64/Feuer.aaxplugin');
                     await signAAXPlugin({ pluginPath: aaxPath });
                 }],
                 ['Sign VST3 plugin', async () => {
-                    const vst3Path = path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Glas.vst3/Contents/x86_64-win/Glas.vst3');
+                    const vst3Path = path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Feuer.vst3/Contents/x86_64-win/Feuer.vst3');
                     await signWindowsExecutable(vst3Path);
                 }],
                 ['Stage content', async () => {
                     const stage = path.join(paths.dist, 'win-payload');
                     await fs.emptyDir(stage);
-                    await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Glas.vst3'), path.join(stage, 'VST3/Glas.vst3'));
-                    await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Glas.aaxplugin'), path.join(stage, 'AAX/Glas.aaxplugin'));
+                    await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Feuer.vst3'), path.join(stage, 'VST3/Feuer.vst3'));
+                    await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Feuer.aaxplugin'), path.join(stage, 'AAX/Feuer.aaxplugin'));
                     await fs.copy(paths.contentDir, path.join(stage, 'Content'));
                 }],
                 ['Build Inno Setup', async () => {
@@ -211,7 +211,7 @@ export async function buildGlas(logger: Logger, args: GlasArgs) {
                     await buildInnoSetup(paths.iss, version.version, stage, true);
                 }],
                 ['Archive debug symbols', async () => {
-                    const archiveDir = path.join(paths.archive, 'glas');
+                    const archiveDir = path.join(paths.archive, 'feuer');
                     const archiveName = `symbols_${version.version}.zip`;
                     const archivePath = path.join(archiveDir, archiveName);
 
@@ -220,8 +220,8 @@ export async function buildGlas(logger: Logger, args: GlasArgs) {
 
                     // Collect PDB files from the build output
                     const pdbSources = [
-                        path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Glas.vst3/Contents/x86_64-win/Glas.pdb'),
-                        path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Glas.aaxplugin/Contents/x64/Glas.pdb'),
+                        path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Feuer.vst3/Contents/x86_64-win/Feuer.pdb'),
+                        path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Feuer.aaxplugin/Contents/x64/Feuer.pdb'),
                     ];
 
                     for (const pdbPath of pdbSources) {
@@ -242,16 +242,16 @@ export async function buildGlas(logger: Logger, args: GlasArgs) {
             ], logger);
 
             if (args.deploy) {
-                const exe = path.join(paths.dist, 'Glas Installer.exe');
-                const storageFid = `Glas-${version.version}.exe`;
+                const exe = path.join(paths.dist, 'Feuer Installer.exe');
+                const storageFid = `Feuer-${version.version}.exe`;
                 await pipeline([
                     ['Upload to Supabase', () => uploadToSupabase(exe, 'shop/installers', storageFid)],
-                    ['Upsert DB row', () => upsertInstallerRow(version.version, GLAS_PRODUCT_TAG, 'win', storageFid)],
+                    ['Upsert DB row', () => upsertInstallerRow(version.version, FEUER_PRODUCT_TAG, 'win', storageFid)],
                 ], logger);
             }
         }
 
-        logger.info('Glas finished', { platform: args.platform, version: version.version });
+        logger.info('Feuer finished', { platform: args.platform, version: version.version });
     } finally {
         // Restore git state if we checked out a tag
         await restoreGit();

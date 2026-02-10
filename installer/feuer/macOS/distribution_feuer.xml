@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>Feuer Version 9.9.9+99</title>
+    <license file="terms-of-service.html"/>
+
+    <pkg-ref id="com.dbdone.feuervst.pkg" version="0" onConclusion="none">feuerVST.pkg</pkg-ref>
+    <pkg-ref id="com.dbdone.feuerau.pkg" version="0" onConclusion="none">feuerAU.pkg</pkg-ref>
+    <pkg-ref id="com.dbdone.feueraax.pkg" version="0" onConclusion="none">feuerAAX.pkg</pkg-ref>
+
+    <pkg-ref id="com.dbdone.feuerpresets.pkg" version="0" onConclusion="none">feuerPRESETS.pkg</pkg-ref>
+
+    <options customize="always" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <choices-outline>
+        <line choice="feuerpresets"/>
+        <line choice="feuervst"/>
+        <line choice="feuerau"/>
+        <line choice="feueraax"/>
+    </choices-outline>
+
+    <choice id="feuerpresets"
+        title="Presets (required)"
+        selected="true"
+        enabled="false"
+        visible="false">
+        <pkg-ref id="com.dbdone.feuerpresets.pkg"/>
+    </choice>
+
+    <choice id="feuervst" title="Feuer Plugin (VST3)" visible="true">
+        <pkg-ref id="com.dbdone.feuervst.pkg"/>
+    </choice>
+    <choice id="feuerau" title="Feuer Plugin (AU)" visible="true">
+        <pkg-ref id="com.dbdone.feuerau.pkg"/>
+    </choice>
+    <choice id="feueraax" title="Feuer Plugin (AAX)" visible="true">
+        <pkg-ref id="com.dbdone.feueraax.pkg"/>
+    </choice>
+</installer-gui-script>

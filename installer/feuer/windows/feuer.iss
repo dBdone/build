@@ -1,11 +1,11 @@
-; -- glas.iss --
-; Glas plugin installer
+; -- feuer.iss --
+; Feuer plugin installer
 
 [Setup]
 ArchitecturesInstallIn64BitMode=x64compatible 
 ArchitecturesAllowed=x64compatible 
-AppName=glas
-OutputBaseFilename="Glas Installer"
+AppName=feuer
+OutputBaseFilename="Feuer Installer"
 AppVersion=0.9.1-5
 WizardStyle=modern
 DefaultDirName={autopf}\dBdone
@@ -17,15 +17,15 @@ LicenseFile="..\..\..\installer\terms-of-service.rtf"
 
 [Files]
 Source: "..\..\..\installer\VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall; Components: main
-Source: "VST3\Glas.vst3\*"; DestDir: "{commoncf}\VST3\Glas.vst3"; Flags: ignoreversion recursesubdirs; Components: main\glasVST
-Source: "AAX\Glas.aaxplugin\*"; DestDir: "{commoncf}\Avid\Audio\Plug-Ins\Glas.aaxplugin"; Flags: ignoreversion recursesubdirs; Components: main\glasAAX
+Source: "VST3\Feuer.vst3\*"; DestDir: "{commoncf}\VST3\Feuer.vst3"; Flags: ignoreversion recursesubdirs; Components: main\feuerVST
+Source: "AAX\Feuer.aaxplugin\*"; DestDir: "{commoncf}\Avid\Audio\Plug-Ins\Feuer.aaxplugin"; Flags: ignoreversion recursesubdirs; Components: main\feuerAAX
 
 
 [Components]
 Name: "base"; Description: "Base Installation"; Types: full custom compact custom; Flags: fixed
-Name: "main"; Description: "Glas Plugin"; Types: full custom compact; Flags: fixed
-Name: "main\glasVST"; Description: "Glas Plugin (VST3)"; Types: full compact; Flags: dontinheritcheck
-Name: "main\glasAAX"; Description: "Glas Plugin (AAX)"; Types: full; Flags: dontinheritcheck
+Name: "main"; Description: "Feuer Plugin"; Types: full custom compact; Flags: fixed
+Name: "main\feuerVST"; Description: "Feuer Plugin (VST3)"; Types: full compact; Flags: dontinheritcheck
+Name: "main\feuerAAX"; Description: "Feuer Plugin (AAX)"; Types: full; Flags: dontinheritcheck
 
 [Run]
 Filename: {tmp}\VC_redist.x64.exe; \
