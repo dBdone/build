@@ -110,7 +110,7 @@ export async function buildAichords(logger: Logger, args: AichordsArgs) {
               identifier: 'com.dbdone.aichordsvst.pkg',
               filename: 'aichordsVST.pkg',
               stage: async (root) => {
-                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'VST3', 'Aichords.vst3');
+                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'VST3', 'aichords.vst3');
                 await fs.ensureDir(path.dirname(target));
                 await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Aichords.vst3'), target);
               }
@@ -119,7 +119,7 @@ export async function buildAichords(logger: Logger, args: AichordsArgs) {
               identifier: 'com.dbdone.aichordsau.pkg',
               filename: 'aichordsAU.pkg',
               stage: async (root) => {
-                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'Components', 'Aichords.component');
+                const target = path.join(root, 'Library', 'Audio', 'Plug-Ins', 'Components', 'aichords.component');
                 await fs.ensureDir(path.dirname(target));
                 await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Aichords.component'), target);
               }
@@ -128,7 +128,7 @@ export async function buildAichords(logger: Logger, args: AichordsArgs) {
               identifier: 'com.dbdone.aichordsaax.pkg',
               filename: 'aichordsAAX.pkg',
               stage: async (root) => {
-                const target = path.join(root, 'Library', 'Application Support', 'Avid', 'Audio', 'Plug-Ins', 'Aichords.aaxplugin');
+                const target = path.join(root, 'Library', 'Application Support', 'Avid', 'Audio', 'Plug-Ins', 'aichords.aaxplugin');
                 await fs.ensureDir(path.dirname(target));
                 await fs.copy(path.join(XCODE_BUILD_ROOT, 'build/Release/Aichords.aaxplugin'), target);
               }
@@ -205,8 +205,8 @@ export async function buildAichords(logger: Logger, args: AichordsArgs) {
         ['Stage content', async () => {
           const stage = path.join(paths.dist, 'win-payload');
           await fs.emptyDir(stage);
-          await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Aichords.vst3'), path.join(stage, 'VST3/Aichords.vst3'));
-          await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Aichords.aaxplugin'), path.join(stage, 'AAX/Aichords.aaxplugin'));
+          await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Aichords.vst3'), path.join(stage, 'VST3/aichords.vst3'));
+          await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Aichords.aaxplugin'), path.join(stage, 'AAX/aichords.aaxplugin'));
           await fs.copy(paths.contentDir, path.join(stage, 'Content'));
 
           const backendDll = fromNative('components/dbDoneBackend/Builds/VisualStudio2022/x64/Release/Dynamic Library/dbdone_backend.dll');

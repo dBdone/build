@@ -16,8 +16,8 @@ LicenseFile="..\..\..\installer\terms-of-service.rtf"
 
 [Files]
 Source: "..\..\..\installer\VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall; Components: main
-Source: "VST3\Aichords.vst3\*"; DestDir: "{commoncf}\VST3\Aichords.vst3"; Flags: ignoreversion recursesubdirs; Components: main\aichordsVST
-Source: "AAX\Aichords.aaxplugin\*"; DestDir: "{commoncf}\Avid\Audio\Plug-Ins\Aichords.aaxplugin"; Flags: ignoreversion recursesubdirs; Components: main\aichordsAAX
+Source: "VST3\aichords.vst3\*"; DestDir: "{commoncf}\VST3\aichords.vst3"; Flags: ignoreversion recursesubdirs; Components: main\aichordsVST
+Source: "AAX\aichords.aaxplugin\*"; DestDir: "{commoncf}\Avid\Audio\Plug-Ins\aichords.aaxplugin"; Flags: ignoreversion recursesubdirs; Components: main\aichordsAAX
 Source: "Backend\dbdone_backend.dll"; DestDir: "{commonappdata}\dBdone\aichords"; Flags: ignoreversion
 Source: "Content\sound\player.sf2"; DestDir: "{commonappdata}\dBdone\aichords\sound"; Flags: ignoreversion; Components: sound
 
