@@ -35,7 +35,7 @@ const paths = {
   versionHeader: path.join(AICHORDS_ROOT, 'Source/version.h'),
   xcode: { project: path.join(XCODE_BUILD_ROOT, 'aichords.xcodeproj'), scheme: 'aichords - All', config: 'Release' },
   msvc: { solution: path.join(MSVC_BUILD_ROOT, 'Aichords.sln'), config: 'Release' },
-  contentDir: AICHORDS_INSTALLER_ROOT,
+  contentDir: path.join(AICHORDS_INSTALLER_ROOT, 'shared'),
   dist: fromBuild('dist', 'aichords'),
   pkg: fromBuild('dist', 'aichords', 'Aichords.pkg'),
   iss: path.join(AICHORDS_INSTALLER_ROOT, 'windows', 'aichords.iss'),
