@@ -7,6 +7,7 @@ import { buildPentimento } from './products/pentimento.js';
 import { buildGlas } from './products/glas.js';
 import { buildFeuer } from './products/feuer.js';
 import { buildApp } from './products/app.js';
+import { buildAichords } from './products/aichords.js';
 
 const argv = yargs(hideBin(process.argv))
   .scriptName('build')
@@ -67,6 +68,21 @@ const argv = yargs(hideBin(process.argv))
     , async (args) => {
       const logger = new Logger(!!args.json);
       await buildApp(logger, {
+        platform: args.platform, mode: args.mode as 'working' | 'latest', fakeVersion: args.fakeVersion,
+        deploy: args.deploy, skipNotarize: args.skipNotarize
+      });
+    })
+  .command('aichords <action>', 'Build/package/deploy Aichords', (y) =>
+    y.positional('action', { choices: ['build'] as const })
+      .option('platform', { choices: ['mac', 'win'] as const, demandOption: true })
+      .option('mode', { choices: ['working', 'latest'] as const, default: 'working' as const })
+      .option('fake-version', { type: 'string', default: '9.9.9-9' })
+      .option('deploy', { type: 'boolean', default: false })
+      .option('skip-notarize', { type: 'boolean', default: false })
+      .option('json', { type: 'boolean', default: false })
+    , async (args) => {
+      const logger = new Logger(!!args.json);
+      await buildAichords(logger, {
         platform: args.platform, mode: args.mode as 'working' | 'latest', fakeVersion: args.fakeVersion,
         deploy: args.deploy, skipNotarize: args.skipNotarize
       });

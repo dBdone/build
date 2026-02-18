@@ -21,6 +21,7 @@ export interface AAXSigningOptions {
 
 
 export async function signAAXPlugin(options: AAXSigningOptions) {
+
   const { pluginPath, autoinstall = false } = options;
 
   const account = requireEnv('AAX_ACCOUNT');
