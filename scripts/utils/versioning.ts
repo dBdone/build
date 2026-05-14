@@ -63,8 +63,9 @@ export async function computeVersion(mode: VersionMode, fallbackWorking = '9.9.9
 }
 
 export async function checkoutVersion(versionInfo: VersionInfo): Promise<() => Promise<void>> {
-  if (versionInfo.mode === 'working' || !versionInfo.tag) {
-    // No checkout needed for working mode
+  if (versionInfo.mode === 'working' || versionInfo.mode === 'latest' || !versionInfo.tag) {
+    // No checkout needed for working/latest mode.
+    // Latest mode derives semver from the latest tag but builds from current HEAD.
     return async () => { }; // noop cleanup
   }
 

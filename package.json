@@ -3,7 +3,9 @@
   "scripts": {
     "b": "tsx scripts/cli.ts",
     "build:mac": "tsx scripts/cli.ts pentimento build --platform mac --mode working",
-    "build:win": "tsx scripts/cli.ts pentimento build --platform win --mode working"
+    "build:win": "tsx scripts/cli.ts pentimento build --platform win --mode working",
+    "build:sampler:mac": "tsx scripts/cli.ts sampler-platform build --platform mac --mode working",
+    "build:sampler:win": "tsx scripts/cli.ts sampler-platform build --platform win --mode working"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.45.0",

@@ -1,0 +1,158 @@
+{
+    "nativeRepo": "sampler_platform",
+    "platforms": {
+        "mac": {
+            "buildSteps": [
+                {
+                    "name": "Build editor",
+                    "cwd": "editor",
+                    "command": "flutter",
+                    "args": [
+                        "build",
+                        "macos",
+                        "--release"
+                    ]
+                },
+                {
+                    "name": "Build player_ui",
+                    "cwd": "plugin_ui",
+                    "command": "flutter",
+                    "args": [
+                        "build",
+                        "macos",
+                        "--release"
+                    ]
+                },
+                {
+                    "name": "Configure player plugin",
+                    "cwd": "player",
+                    "command": "cmake",
+                    "args": [
+                        "-S",
+                        ".",
+                        "-B",
+                        "build-cmake",
+                        "-DONEX_COPY_PLUGIN_AFTER_BUILD=OFF"
+                    ]
+                },
+                {
+                    "name": "Build player plugin",
+                    "cwd": "player",
+                    "command": "cmake",
+                    "args": [
+                        "--build",
+                        "build-cmake",
+                        "--config",
+                        "Release"
+                    ]
+                }
+            ],
+            "artifacts": [
+                {
+                    "from": "editor/build/macos/Build/Products/Release",
+                    "to": "editor"
+                },
+                {
+                    "from": "player/build-cmake/onex_artefacts/Standalone/ONE-X.app",
+                    "to": "standalone/ONE-X-Standalone.app"
+                },
+                {
+                    "from": "player/build-cmake/onex_artefacts/VST3/ONE-X.vst3",
+                    "to": "plugins/vst3/ONE-X.vst3"
+                },
+                {
+                    "from": "player/build-cmake/onex_artefacts/AU/ONE-X.component",
+                    "to": "plugins/au/ONE-X.component"
+                },
+                {
+                    "from": "player/build-cmake/onex_artefacts/AAX/ONE-X.aaxplugin",
+                    "to": "plugins/aax/ONE-X.aaxplugin"
+                }
+            ],
+            "thirdPartyRuntime": []
+        },
+        "win": {
+            "buildSteps": [
+                {
+                    "name": "Build editor",
+                    "cwd": "editor",
+                    "command": "flutter",
+                    "args": [
+                        "build",
+                        "windows",
+                        "--release"
+                    ]
+                },
+                {
+                    "name": "Build player_ui",
+                    "cwd": "plugin_ui",
+                    "command": "flutter",
+                    "args": [
+                        "build",
+                        "windows",
+                        "--release"
+                    ]
+                },
+                {
+                    "name": "Configure player plugin",
+                    "cwd": "player",
+                    "command": "cmake",
+                    "args": [
+                        "-S",
+                        ".",
+                        "-B",
+                        "build-cmake",
+                        "-DONEX_COPY_PLUGIN_AFTER_BUILD=OFF"
+                    ]
+                },
+                {
+                    "name": "Build player plugin",
+                    "cwd": "player",
+                    "command": "cmake",
+                    "args": [
+                        "--build",
+                        "build-cmake",
+                        "--config",
+                        "Release"
+                    ]
+                }
+            ],
+            "artifacts": [
+                {
+                    "from": "editor/build/windows/x64/runner/Release",
+                    "to": "editor"
+                },
+                {
+                    "from": "plugin_ui/build/windows/x64/runner/Release/data/flutter_assets",
+                    "to": "app_support/ui_cache/${semver}/flutter_assets"
+                },
+                {
+                    "from": "plugin_ui/build/windows/x64/runner/Release/data/app.so",
+                    "to": "app_support/ui_cache/${semver}/app.so"
+                },
+                {
+                    "from": "plugin_ui/build/windows/x64/runner/Release/data/icudtl.dat",
+                    "to": "app_support/ui_cache/${semver}/icudtl.dat"
+                },
+                {
+                    "from": "player/build-cmake/onex_artefacts/Standalone",
+                    "to": "standalone"
+                },
+                {
+                    "from": "player/build-cmake/onex_artefacts/VST3/ONE-X.vst3",
+                    "to": "plugins/vst3/ONE-X.vst3"
+                },
+                {
+                    "from": "player/build-cmake/onex_artefacts/AAX/ONE-X.aaxplugin",
+                    "to": "plugins/aax/ONE-X.aaxplugin"
+                }
+            ],
+            "thirdPartyRuntime": [
+                {
+                    "from": "plugin_ui/build/windows/x64/runner/Release/flutter_windows.dll",
+                    "to": "app_support/bin/flutter_windows.dll"
+                }
+            ]
+        }
+    }
+}
