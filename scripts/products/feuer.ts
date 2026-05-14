@@ -36,6 +36,7 @@ const paths = {
     xcode: { project: path.join(XCODE_BUILD_ROOT, 'feuer.xcodeproj'), scheme: 'feuer - All', config: 'Release' },
     msvc: { solution: path.join(MSVC_BUILD_ROOT, 'Feuer.sln'), config: 'Release' },
     contentDir: path.join(FEUER_INSTALLER_ROOT, 'shared'),
+    presetsDir: path.join(FEUER_INSTALLER_ROOT, 'presets'),
     dist: fromBuild('dist', 'feuer'),
     pkg: fromBuild('dist', 'feuer', 'Feuer.pkg'),
     iss: path.join(FEUER_INSTALLER_ROOT, 'windows', 'feuer.iss'),
@@ -46,6 +47,16 @@ const paths = {
 export async function buildFeuer(logger: Logger, args: FeuerArgs) {
     // Clear and ensure dist directory for clean build
     await fs.emptyDir(paths.dist);
+
+    const legacyPresetsDir = path.join(paths.contentDir, 'presets');
+    const hasPreferredPresets = await fs.pathExists(paths.presetsDir);
+    const presetsSourceDir = hasPreferredPresets ? paths.presetsDir : legacyPresetsDir;
+    if (!hasPreferredPresets && await fs.pathExists(legacyPresetsDir)) {
+        logger.warn('Using legacy presets source path; prefer build/installer/feuer/presets', {
+            legacyPath: legacyPresetsDir,
+            preferredPath: paths.presetsDir,
+        });
+    }
 
     const version: VersionInfo = await computeVersion(args.mode, args.fakeVersion ?? '9.9.9-9', 'FEUER_V');
     logger.info(`Version resolved`, version);
@@ -112,8 +123,6 @@ export async function buildFeuer(logger: Logger, args: FeuerArgs) {
             await pipeline([
                 ['Prepare macOS installer resources', () => prepareMacInstallerResources()],
                 ['Build macOS packages', async () => {
-                    const presetsSourceDir = path.join(paths.contentDir, 'presets');
-
                     // Define package specifications
                     const packages: MacPackageSpec[] = [
                         {
@@ -204,7 +213,9 @@ export async function buildFeuer(logger: Logger, args: FeuerArgs) {
                     await fs.emptyDir(stage);
                     await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/VST3/Feuer.vst3'), path.join(stage, 'VST3/Feuer.vst3'));
                     await fs.copy(path.join(MSVC_BUILD_ROOT, 'x64/Release/AAX/Feuer.aaxplugin'), path.join(stage, 'AAX/Feuer.aaxplugin'));
-                    await fs.copy(paths.contentDir, path.join(stage, 'Content'));
+                    if (await fs.pathExists(presetsSourceDir)) {
+                        await fs.copy(presetsSourceDir, path.join(stage, 'Content', 'presets'));
+                    }
                 }],
                 ['Build Inno Setup', async () => {
                     const stage = path.join(paths.dist, 'win-payload');

@@ -8,7 +8,9 @@ AppName=feuer
 OutputBaseFilename="Feuer Installer"
 AppVersion=0.9.1-5
 WizardStyle=modern
-DefaultDirName={autopf}\dBdone
+DefaultDirName={commonappdata}\dBdone
+UsePreviousAppDir=no
+DisableDirPage=yes
 DefaultGroupName=dBdone
 Compression=zip
 SolidCompression=yes
@@ -19,10 +21,12 @@ LicenseFile="..\..\..\installer\terms-of-service.rtf"
 Source: "..\..\..\installer\VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall; Components: main
 Source: "VST3\Feuer.vst3\*"; DestDir: "{commoncf}\VST3\Feuer.vst3"; Flags: ignoreversion recursesubdirs; Components: main\feuerVST
 Source: "AAX\Feuer.aaxplugin\*"; DestDir: "{commoncf}\Avid\Audio\Plug-Ins\Feuer.aaxplugin"; Flags: ignoreversion recursesubdirs; Components: main\feuerAAX
+Source: "Content\presets\*"; DestDir: "{commonappdata}\dBdone\feuer\presets"; Flags: ignoreversion recursesubdirs; Components: presets
 
 
 [Components]
 Name: "base"; Description: "Base Installation"; Types: full custom compact custom; Flags: fixed
+Name: "presets"; Description: "Factory Presets"; Types: full custom compact custom; Flags: fixed
 Name: "main"; Description: "Feuer Plugin"; Types: full custom compact; Flags: fixed
 Name: "main\feuerVST"; Description: "Feuer Plugin (VST3)"; Types: full compact; Flags: dontinheritcheck
 Name: "main\feuerAAX"; Description: "Feuer Plugin (AAX)"; Types: full; Flags: dontinheritcheck
