@@ -122,6 +122,9 @@ export async function buildOnex(logger: Logger, args: OnexArgs) {
                     await fs.writeFile(pubspecPath, patched, 'utf-8');
                 }
             }],
+            ['Build documentation', async () => {
+                await buildDocumentation(nativeRepoRoot, stageRoot, logger);
+            }],
             ...platformConfig.buildSteps.map((step) => [
                 `Build step: ${step.name}`,
                 () => runManifestStep(step, nativeRepoRoot, logger),
@@ -240,6 +243,7 @@ async function assembleMacPkgRoot(stageRoot: string, macPkgRoot: string) {
     const onexFolder = path.join(macPkgRoot, 'Applications', 'ONE-X');
     const standaloneTarget = path.join(onexFolder, 'ONE-X-Standalone.app');
     const editorTarget = path.join(onexFolder, 'onex_editor.app');
+    const docsTarget = path.join(onexFolder, 'doc');
     const vst3Target = path.join(macPkgRoot, 'Library', 'Audio', 'Plug-Ins', 'VST3', 'ONE-X.vst3');
     const auTarget = path.join(macPkgRoot, 'Library', 'Audio', 'Plug-Ins', 'Components', 'ONE-X.component');
     const aaxTarget = path.join(macPkgRoot, 'Library', 'Application Support', 'Avid', 'Audio', 'Plug-Ins', 'ONE-X.aaxplugin');
@@ -256,6 +260,11 @@ async function assembleMacPkgRoot(stageRoot: string, macPkgRoot: string) {
     const stagedEditorApp = path.join(stageRoot, 'editor', 'onex_editor.app');
     if (await fs.pathExists(stagedEditorApp)) {
         await fs.copy(stagedEditorApp, editorTarget);
+    }
+
+    const stagedDocs = path.join(stageRoot, 'doc');
+    if (await fs.pathExists(stagedDocs)) {
+        await fs.copy(stagedDocs, docsTarget);
     }
 
     const stagedVst3 = path.join(stageRoot, 'plugins', 'vst3', 'ONE-X.vst3');
@@ -313,6 +322,141 @@ async function collectDirsRecursively(root: string): Promise<string[]> {
 
 function depth(filePath: string): number {
     return filePath.split(path.sep).length;
+}
+
+async function buildDocumentation(nativeRepoRoot: string, stageRoot: string, logger: Logger) {
+    const docsRoot = path.join(nativeRepoRoot, 'documentation');
+    const docOutputDir = path.join(stageRoot, 'doc');
+    const cssFileName = 'onex-docs.css';
+    const cssOutputPath = path.join(docOutputDir, cssFileName);
+
+    if (!(await fs.pathExists(docsRoot))) {
+        logger.info('Documentation directory does not exist, skipping docs build', { docsRoot });
+        return;
+    }
+
+    await fs.ensureDir(docOutputDir);
+
+    await fs.writeFile(cssOutputPath, `:root {
+    --content-width: 960px;
+    --text: #1f2328;
+    --muted: #59636e;
+    --border: #d0d7de;
+    --surface: #ffffff;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--surface);
+    color: var(--text);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+}
+
+body {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 32px 24px 48px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    line-height: 1.25;
+}
+
+code,
+pre {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    overflow-x: auto;
+}
+
+a {
+    color: #0969da;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+}
+
+.toc,
+#TOC {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 24px;
+}
+
+blockquote {
+    border-left: 4px solid var(--border);
+    margin: 0;
+    padding: 0 0 0 14px;
+    color: var(--muted);
+}
+`, 'utf-8');
+
+    const docSections = [
+        { folder: 'rt-scripting', output: 'rt-scripting.html', title: 'ONE-X RT Scripting' },
+        { folder: 'ui-builder', output: 'ui-builder.html', title: 'ONE-X UI Builder' },
+    ];
+
+    for (const section of docSections) {
+        const sectionDir = path.join(docsRoot, section.folder);
+        if (!(await fs.pathExists(sectionDir))) {
+            throw new Error(`Documentation section is missing: ${sectionDir}`);
+        }
+
+        const entries = await fs.readdir(sectionDir, { withFileTypes: true });
+        const chapterPaths = entries
+            .filter((entry) => entry.isFile())
+            .map((entry) => entry.name)
+            .filter((name) => /^\d.*\.md$/i.test(name))
+            .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+            .map((name) => path.join(sectionDir, name));
+
+        if (!chapterPaths.length) {
+            throw new Error(`No numbered documentation chapters found in ${sectionDir}`);
+        }
+
+        const outputPath = path.join(docOutputDir, section.output);
+        logger.info('Build documentation HTML', {
+            section: section.folder,
+            chapters: chapterPaths.length,
+            outputPath,
+        });
+
+        await sh('pandoc', [
+            ...chapterPaths,
+            '--standalone',
+            '--toc',
+            '--metadata',
+            `title=${section.title}`,
+            '--css',
+            cssFileName,
+            '-o',
+            outputPath,
+        ]);
+    }
 }
 
 async function stageArtifacts(

@@ -123,27 +123,19 @@
                     "to": "editor"
                 },
                 {
-                    "from": "plugin_ui/build/windows/x64/runner/Release/data/flutter_assets",
-                    "to": "app_support/ui_cache/${semver}/flutter_assets"
+                    "from": "plugin_ui/build/windows/x64/runner/Release/data",
+                    "to": "app_support/ui_cache/${semver}"
                 },
                 {
-                    "from": "plugin_ui/build/windows/x64/runner/Release/data/app.so",
-                    "to": "app_support/ui_cache/${semver}/app.so"
-                },
-                {
-                    "from": "plugin_ui/build/windows/x64/runner/Release/data/icudtl.dat",
-                    "to": "app_support/ui_cache/${semver}/icudtl.dat"
-                },
-                {
-                    "from": "player/build-cmake/onex_artefacts/Standalone",
+                    "from": "player/build-cmake/onex_artefacts/Release/Standalone",
                     "to": "standalone"
                 },
                 {
-                    "from": "player/build-cmake/onex_artefacts/VST3/ONE-X.vst3",
+                    "from": "player/build-cmake/onex_artefacts/Release/VST3/ONE-X.vst3",
                     "to": "plugins/vst3/ONE-X.vst3"
                 },
                 {
-                    "from": "player/build-cmake/onex_artefacts/AAX/ONE-X.aaxplugin",
+                    "from": "player/build-cmake/onex_artefacts/Release/AAX/ONE-X.aaxplugin",
                     "to": "plugins/aax/ONE-X.aaxplugin"
                 }
             ],
