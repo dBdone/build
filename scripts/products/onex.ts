@@ -329,6 +329,7 @@ async function buildDocumentation(nativeRepoRoot: string, stageRoot: string, log
     const docOutputDir = path.join(stageRoot, 'doc');
     const cssFileName = 'onex-docs.css';
     const cssOutputPath = path.join(docOutputDir, cssFileName);
+    const outputImagesDir = path.join(docOutputDir, 'img');
 
     if (!(await fs.pathExists(docsRoot))) {
         logger.info('Documentation directory does not exist, skipping docs build', { docsRoot });
@@ -336,6 +337,8 @@ async function buildDocumentation(nativeRepoRoot: string, stageRoot: string, log
     }
 
     await fs.ensureDir(docOutputDir);
+
+    await stageDocumentationImages([path.join(docsRoot, 'img')], outputImagesDir);
 
     await fs.writeFile(cssOutputPath, `:root {
     --content-width: 960px;
@@ -426,6 +429,8 @@ blockquote {
             throw new Error(`Documentation section is missing: ${sectionDir}`);
         }
 
+        await stageDocumentationImages([path.join(sectionDir, 'img')], outputImagesDir);
+
         const entries = await fs.readdir(sectionDir, { withFileTypes: true });
         const chapterPaths = entries
             .filter((entry) => entry.isFile())
@@ -456,6 +461,16 @@ blockquote {
             '-o',
             outputPath,
         ]);
+    }
+}
+
+async function stageDocumentationImages(sourceDirs: string[], outputImagesDir: string) {
+    for (const sourceDir of sourceDirs) {
+        if (!(await fs.pathExists(sourceDir))) {
+            continue;
+        }
+
+        await fs.copy(sourceDir, outputImagesDir, { overwrite: true, errorOnExist: false });
     }
 }
 
