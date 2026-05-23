@@ -50,7 +50,29 @@ export async function runManifestStep(step: OnexManifestStep, nativeRepoRoot: st
         args,
     });
 
-    await sh(step.command, args, { cwd: absCwd });
+    try {
+        await sh(step.command, args, { cwd: absCwd });
+    } catch (error: any) {
+        const isFlutterMacBuild =
+            step.command === 'flutter' &&
+            args.length >= 2 &&
+            args[0] === 'build' &&
+            args[1] === 'macos';
+
+        if (!isFlutterMacBuild) {
+            throw error;
+        }
+
+        logger.warn('Flutter macOS build failed; retrying once with Swift Package Manager disabled for this command.');
+
+        await sh(step.command, args, {
+            cwd: absCwd,
+            env: {
+                ...process.env,
+                FLUTTER_SWIFT_PACKAGE_MANAGER: 'false',
+            },
+        });
+    }
 }
 
 function validateManifest(raw: any, filePath: string) {
