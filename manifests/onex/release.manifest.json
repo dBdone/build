@@ -32,7 +32,10 @@
                         ".",
                         "-B",
                         "build-cmake",
-                        "-DONEX_COPY_PLUGIN_AFTER_BUILD=OFF"
+                        "-DCMAKE_BUILD_TYPE=Release",
+                        "-DONEX_COPY_PLUGIN_AFTER_BUILD=OFF",
+                        "-DONEX_PLUGIN_VERSION=${semver}",
+                        "-DONEX_PLUGIN_BUILD_VERSION=${appleBuildVersion}"
                     ]
                 },
                 {
@@ -53,19 +56,19 @@
                     "to": "editor"
                 },
                 {
-                    "from": "player/build-cmake/onex_artefacts/Standalone/ONE-X.app",
+                    "from": "player/build-cmake/onex_artefacts/Release/Standalone/ONE-X-Standalone.app",
                     "to": "standalone/ONE-X-Standalone.app"
                 },
                 {
-                    "from": "player/build-cmake/onex_artefacts/VST3/ONE-X.vst3",
+                    "from": "player/build-cmake/onex_artefacts/Release/VST3/ONE-X.vst3",
                     "to": "plugins/vst3/ONE-X.vst3"
                 },
                 {
-                    "from": "player/build-cmake/onex_artefacts/AU/ONE-X.component",
+                    "from": "player/build-cmake/onex_artefacts/Release/AU/ONE-X.component",
                     "to": "plugins/au/ONE-X.component"
                 },
                 {
-                    "from": "player/build-cmake/onex_artefacts/AAX/ONE-X.aaxplugin",
+                    "from": "player/build-cmake/onex_artefacts/Release/AAX/ONE-X.aaxplugin",
                     "to": "plugins/aax/ONE-X.aaxplugin"
                 }
             ],

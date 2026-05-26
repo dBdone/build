@@ -22,16 +22,16 @@ export async function buildInnoSetup(issPath: string, version: string, stagingDi
 
   // Determine where to write the temp .iss file
   // If stagingDir is empty/not provided, create temp file next to original
-  const tempIss = stagingDir 
+  const tempIss = stagingDir
     ? path.join(stagingDir, path.basename(issPath))
     : issPath + '.tmp';
-  
+
   await fs.writeFile(tempIss, issContent, 'utf-8');
 
   // Extract OutputDir and OutputBaseFilename from .iss to determine the installer path
   const outputDirMatch = issContent.match(/^OutputDir=(.*)$/m);
   const outputBaseFilenameMatch = issContent.match(/^OutputBaseFilename="?([^"\r\n]+)"?$/m);
-  
+
   if (!outputDirMatch || !outputBaseFilenameMatch) {
     throw new Error('Could not find OutputDir or OutputBaseFilename in .iss file');
   }
@@ -45,7 +45,7 @@ export async function buildInnoSetup(issPath: string, version: string, stagingDi
   try {
     // Run Inno Setup compiler
     await sh(iscc, [tempIss]);
-    
+
     // Sign the installer if requested
     if (sign) {
       await signWindowsExecutable(installerPath);
@@ -174,4 +174,179 @@ export async function pkgbuild(rootDir: string, identifier: string, version: str
 
   args.push(outPkg);
   await sh('pkgbuild', args);
+}
+
+export interface PackageCollisionIssue {
+  code: string;
+  message: string;
+  paths: string[];
+}
+
+// Validate that package bundle roots are physically independent before pkgbuild.
+// This catches cross-bundle hardlinks/symlinks that can trigger installer extraction collisions.
+export async function validateMacPackageRootNoBundleCollisions(
+  rootDir: string,
+  relativeBundleRoots: string[]
+): Promise<void> {
+  const normalized = [...new Set(relativeBundleRoots.map((p) => path.normalize(p)))]
+    .map((p) => p.replace(/^\/+/, ''));
+
+  const absoluteBundleRoots = normalized.map((relPath) => path.join(rootDir, relPath));
+  const issues: PackageCollisionIssue[] = [];
+
+  for (const bundlePath of absoluteBundleRoots) {
+    if (!(await fs.pathExists(bundlePath))) {
+      issues.push({
+        code: 'MISSING_BUNDLE_ROOT',
+        message: 'Expected bundle root is missing in package root.',
+        paths: [bundlePath],
+      });
+      continue;
+    }
+
+    const stat = await fs.lstat(bundlePath);
+    if (!stat.isDirectory()) {
+      issues.push({
+        code: 'INVALID_BUNDLE_ROOT',
+        message: 'Expected bundle root is not a directory.',
+        paths: [bundlePath],
+      });
+    }
+  }
+
+  if (issues.length) {
+    throw new Error(formatPackageCollisionIssues(rootDir, issues));
+  }
+
+  const realRootMap = new Map<string, string[]>();
+  for (const bundlePath of absoluteBundleRoots) {
+    const resolved = await fs.realpath(bundlePath);
+    const existing = realRootMap.get(resolved);
+    if (existing) {
+      existing.push(bundlePath);
+    } else {
+      realRootMap.set(resolved, [bundlePath]);
+    }
+  }
+
+  for (const collidingRoots of realRootMap.values()) {
+    if (collidingRoots.length > 1) {
+      issues.push({
+        code: 'BUNDLE_ROOT_ALIAS',
+        message: 'Multiple bundle roots resolve to the same physical path.',
+        paths: collidingRoots,
+      });
+    }
+  }
+
+  type Ownership = { bundleRoot: string; path: string };
+  const inodeOwners = new Map<string, Ownership[]>();
+
+  for (const bundlePath of absoluteBundleRoots) {
+    const bundleRealRoot = await fs.realpath(bundlePath);
+    const entries = await collectDirsAndFiles(bundlePath);
+
+    for (const entryPath of entries) {
+      const stat = await fs.lstat(entryPath);
+
+      if (stat.isSymbolicLink()) {
+        let resolvedEntry: string;
+        try {
+          resolvedEntry = await fs.realpath(entryPath);
+        } catch (error: any) {
+          if (error?.code === 'ENOENT') {
+            issues.push({
+              code: 'BROKEN_SYMLINK',
+              message: 'Symlink target does not exist.',
+              paths: [entryPath, bundlePath],
+            });
+            continue;
+          }
+          throw error;
+        }
+
+        if (!isWithin(resolvedEntry, bundleRealRoot)) {
+          issues.push({
+            code: 'EXTERNAL_SYMLINK_TARGET',
+            message: 'Symlink target resolves outside its bundle root.',
+            paths: [entryPath, resolvedEntry, bundlePath],
+          });
+        }
+        continue;
+      }
+
+      if (!stat.isFile()) {
+        continue;
+      }
+
+      if (stat.nlink <= 1) {
+        continue;
+      }
+
+      const inodeKey = `${stat.dev}:${stat.ino}`;
+      const owners = inodeOwners.get(inodeKey) ?? [];
+      owners.push({ bundleRoot: bundlePath, path: entryPath });
+      inodeOwners.set(inodeKey, owners);
+    }
+  }
+
+  for (const owners of inodeOwners.values()) {
+    const uniqueBundleRoots = [...new Set(owners.map((owner) => owner.bundleRoot))];
+    if (uniqueBundleRoots.length <= 1) {
+      continue;
+    }
+
+    issues.push({
+      code: 'CROSS_BUNDLE_HARDLINK',
+      message: 'A hardlinked file is shared across different bundle roots.',
+      paths: owners.map((owner) => owner.path),
+    });
+  }
+
+  if (issues.length) {
+    throw new Error(formatPackageCollisionIssues(rootDir, issues));
+  }
+}
+
+async function collectDirsAndFiles(root: string): Promise<string[]> {
+  const out: string[] = [];
+  const queue: string[] = [root];
+
+  while (queue.length) {
+    const dirPath = queue.pop()!;
+    const entries = await fs.readdir(dirPath);
+    for (const name of entries) {
+      const fullPath = path.join(dirPath, name);
+      out.push(fullPath);
+
+      const stat = await fs.lstat(fullPath);
+      if (stat.isDirectory() && !stat.isSymbolicLink()) {
+        queue.push(fullPath);
+      }
+    }
+  }
+
+  return out;
+}
+
+function isWithin(candidatePath: string, rootPath: string): boolean {
+  const relative = path.relative(rootPath, candidatePath);
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function formatPackageCollisionIssues(rootDir: string, issues: PackageCollisionIssue[]): string {
+  const lines = [
+    `Packaging preflight failed for ${rootDir}.`,
+    'Detected bundle collision risks:',
+  ];
+
+  for (const issue of issues) {
+    lines.push(`- [${issue.code}] ${issue.message}`);
+    for (const issuePath of issue.paths) {
+      lines.push(`  - ${issuePath}`);
+    }
+  }
+
+  lines.push('Refusing to run pkgbuild with an unsafe package root.');
+  return lines.join('\n');
 }

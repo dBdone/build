@@ -5,7 +5,7 @@ import { fromBuild, fromNative } from '../utils/root.js';
 import { pipeline } from '../utils/tasks.js';
 import { computeVersion, checkoutVersion, VersionInfo, VersionMode } from '../utils/versioning.js';
 import { runManifestStep, OnexReleaseManifest, loadOnexManifest } from '../services/onex_manifest.js';
-import { buildInnoSetup, pkgbuild } from '../services/installers.js';
+import { buildInnoSetup, pkgbuild, validateMacPackageRootNoBundleCollisions } from '../services/installers.js';
 import { signWindowsExecutable } from '../services/codesign_windows.js';
 import { notarizeAndStaple, setupSigningKeychain } from '../services/notarize.js';
 import { sh } from '../services/exec.js';
@@ -81,6 +81,14 @@ export async function buildOnex(logger: Logger, args: OnexArgs) {
                     ['Assemble macOS pkg root', async () => {
                         await assembleMacPkgRoot(stageRoot, macPkgRoot);
                     }],
+                    ['Validate pkg root bundle independence', async () => {
+                        await validateMacPackageRootNoBundleCollisions(macPkgRoot, [
+                            path.join('Applications', 'ONE-X', 'ONE-X-Standalone.app'),
+                            path.join('Library', 'Audio', 'Plug-Ins', 'VST3', 'ONE-X.vst3'),
+                            path.join('Library', 'Audio', 'Plug-Ins', 'Components', 'ONE-X.component'),
+                            path.join('Library', 'Application Support', 'Avid', 'Audio', 'Plug-Ins', 'ONE-X.aaxplugin'),
+                        ]);
+                    }],
                     ['Build signed macOS pkg', async () => {
                         await pkgbuild(
                             macPkgRoot,
@@ -97,12 +105,20 @@ export async function buildOnex(logger: Logger, args: OnexArgs) {
                 ];
 
         const semver = `${version.major}.${version.minor}.${version.patch}`;
+        const appleBuildVersion = `${semver}.${version.build}`;
         const versionHeaderPath = path.join(nativeRepoRoot, 'player', 'Source', 'version.h');
         const pubspecPaths = [
             path.join(nativeRepoRoot, 'editor', 'pubspec.yaml'),
             path.join(nativeRepoRoot, 'plugin_ui', 'pubspec.yaml'),
         ];
         const flutterVersion = `${semver}+${version.build}`;
+
+        const resolveTemplate = (value: string) =>
+            value
+                .replaceAll('${version}', version.version)
+                .replaceAll('${semver}', semver)
+                .replaceAll('${build}', String(version.build))
+                .replaceAll('${appleBuildVersion}', appleBuildVersion);
 
         await pipeline([
             ['Create staging directory', async () => {
@@ -125,10 +141,19 @@ export async function buildOnex(logger: Logger, args: OnexArgs) {
             ['Build documentation', async () => {
                 await buildDocumentation(nativeRepoRoot, stageRoot, logger);
             }],
-            ...platformConfig.buildSteps.map((step) => [
-                `Build step: ${step.name}`,
-                () => runManifestStep(step, nativeRepoRoot, logger),
-            ] as [string, () => Promise<void>]),
+            ...platformConfig.buildSteps.map((step) => {
+                const resolvedStep = {
+                    ...step,
+                    cwd: resolveTemplate(step.cwd),
+                    command: resolveTemplate(step.command),
+                    args: (step.args ?? []).map(resolveTemplate),
+                };
+
+                return [
+                    `Build step: ${step.name}`,
+                    () => runManifestStep(resolvedStep, nativeRepoRoot, logger),
+                ] as [string, () => Promise<void>];
+            }),
             ['Stage build artifacts', async () => {
                 await stageArtifacts(manifest, platformConfig, nativeRepoRoot, stageRoot, version.version, semver);
             }],
@@ -217,9 +242,22 @@ async function normalizeFrameworkLayouts(stageRoot: string, logger: Logger) {
         }
 
         // Ensure canonical framework links so codesign can classify/sign correctly.
+        const frameworkBinaryName = path.basename(frameworkPath, '.framework');
+
         await ensureSymlinkPath(path.join(versionsDir, 'Current'), 'A');
-        await ensureSymlinkPath(path.join(frameworkPath, 'App'), path.join('Versions', 'Current', 'App'));
-        await ensureSymlinkPath(path.join(frameworkPath, 'Resources'), path.join('Versions', 'Current', 'Resources'));
+
+        const versionABinary = path.join(versionAPath, frameworkBinaryName);
+        if (await fs.pathExists(versionABinary)) {
+            await ensureSymlinkPath(
+                path.join(frameworkPath, frameworkBinaryName),
+                path.join('Versions', 'Current', frameworkBinaryName)
+            );
+        }
+
+        const versionAResources = path.join(versionAPath, 'Resources');
+        if (await fs.pathExists(versionAResources)) {
+            await ensureSymlinkPath(path.join(frameworkPath, 'Resources'), path.join('Versions', 'Current', 'Resources'));
+        }
 
         logger.info('Normalized framework layout', { frameworkPath });
     }
