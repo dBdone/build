@@ -25,6 +25,8 @@ const PRODUCT_NAME = 'onex';
 const PRODUCT_TAG = 'dbd-onex';
 
 export async function buildOnex(logger: Logger, args: OnexArgs) {
+    await runBuildDependenciesStep(logger, args.platform);
+
     const distDir = fromBuild('dist', PRODUCT_NAME);
     const windowsIssPath = fromBuild('installer', 'onex', 'windows', 'onex.iss');
 
@@ -182,6 +184,25 @@ export async function buildOnex(logger: Logger, args: OnexArgs) {
     } finally {
         await restoreGit();
     }
+}
+
+async function runBuildDependenciesStep(logger: Logger, platform: 'mac' | 'win') {
+    const scriptsDir = fromNative('sampler_platform', 'build_dependencies');
+    const scriptFile = platform === 'win' ? 'build_deps.ps1' : 'build_deps.sh';
+    const scriptPath = path.join(scriptsDir, scriptFile);
+
+    if (!(await fs.pathExists(scriptPath))) {
+        throw new Error(`Missing ONE-X dependency script: ${scriptPath}`);
+    }
+
+    logger.info('Run ONE-X dependency build step', { platform, scriptPath });
+
+    if (platform === 'win') {
+        await sh('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath], { cwd: scriptsDir });
+        return;
+    }
+
+    await sh('zsh', [scriptPath], { cwd: scriptsDir });
 }
 
 async function signWindowsPayload(stageRoot: string, logger: Logger) {
