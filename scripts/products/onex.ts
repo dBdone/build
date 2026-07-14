@@ -141,7 +141,7 @@ export async function buildOnex(logger: Logger, args: OnexArgs) {
                 }
             }],
             ['Build documentation', async () => {
-                await buildDocumentation(nativeRepoRoot, stageRoot, logger);
+                await buildDocumentation(nativeRepoRoot, stageRoot, logger, args.platform);
             }],
             ...platformConfig.buildSteps.map((step) => {
                 const resolvedStep = {
@@ -198,11 +198,27 @@ async function runBuildDependenciesStep(logger: Logger, platform: 'mac' | 'win')
     logger.info('Run ONE-X dependency build step', { platform, scriptPath });
 
     if (platform === 'win') {
-        await sh('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath], { cwd: scriptsDir });
+        await runWindowsPowerShellScript(scriptPath, scriptsDir, logger);
         return;
     }
 
     await sh('zsh', [scriptPath], { cwd: scriptsDir });
+}
+
+async function runWindowsPowerShellScript(scriptPath: string, cwd: string, logger: Logger) {
+    try {
+        // Prefer PowerShell 7+, which reliably reads UTF-8 scripts without BOM.
+        await sh('pwsh', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath], { cwd });
+        return;
+    } catch (error) {
+        const maybeError = error as NodeJS.ErrnoException;
+        if (maybeError?.code !== 'ENOENT') {
+            throw error;
+        }
+
+        logger.info('pwsh not found, falling back to Windows PowerShell', { scriptPath });
+        await sh('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath], { cwd });
+    }
 }
 
 async function signWindowsPayload(stageRoot: string, logger: Logger) {
@@ -383,154 +399,40 @@ function depth(filePath: string): number {
     return filePath.split(path.sep).length;
 }
 
-async function buildDocumentation(nativeRepoRoot: string, stageRoot: string, logger: Logger) {
+async function buildDocumentation(
+    nativeRepoRoot: string,
+    stageRoot: string,
+    logger: Logger,
+    platform: 'mac' | 'win'
+) {
     const docsRoot = path.join(nativeRepoRoot, 'documentation');
-    const docOutputDir = path.join(stageRoot, 'doc');
-    const cssFileName = 'onex-docs.css';
-    const cssOutputPath = path.join(docOutputDir, cssFileName);
-    const outputImagesDir = path.join(docOutputDir, 'img');
+    const docsOutputRoot = path.join(docsRoot, 'output');
+    const stagedDocsRoot = path.join(stageRoot, 'doc');
+    const scriptFile = platform === 'win' ? 'build-docs.ps1' : 'build-docs.sh';
+    const scriptPath = path.join(docsRoot, scriptFile);
 
     if (!(await fs.pathExists(docsRoot))) {
-        logger.info('Documentation directory does not exist, skipping docs build', { docsRoot });
-        return;
+        throw new Error(`Documentation directory does not exist: ${docsRoot}`);
     }
 
-    await fs.ensureDir(docOutputDir);
-
-    await stageDocumentationImages([path.join(docsRoot, 'img')], outputImagesDir);
-
-    await fs.writeFile(cssOutputPath, `:root {
-    --content-width: 960px;
-    --text: #1f2328;
-    --muted: #59636e;
-    --border: #d0d7de;
-    --surface: #ffffff;
-}
-
-html,
-body {
-    margin: 0;
-    padding: 0;
-    background: var(--surface);
-    color: var(--text);
-    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    line-height: 1.6;
-}
-
-body {
-    max-width: var(--content-width);
-    margin: 0 auto;
-    padding: 32px 24px 48px;
-}
-
-h1,
-h2,
-h3,
-h4 {
-    line-height: 1.25;
-}
-
-code,
-pre {
-    font-family: Consolas, "Courier New", monospace;
-}
-
-pre {
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 12px;
-    overflow-x: auto;
-}
-
-a {
-    color: #0969da;
-}
-
-hr {
-    border: 0;
-    border-top: 1px solid var(--border);
-}
-
-table {
-    border-collapse: collapse;
-}
-
-th,
-td {
-    border: 1px solid var(--border);
-    padding: 6px 10px;
-}
-
-.toc,
-#TOC {
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 24px;
-}
-
-blockquote {
-    border-left: 4px solid var(--border);
-    margin: 0;
-    padding: 0 0 0 14px;
-    color: var(--muted);
-}
-`, 'utf-8');
-
-    const docSections = [
-        { folder: 'rt-scripting', output: 'rt-scripting.html', title: 'ONE-X RT Scripting' },
-        { folder: 'ui-builder', output: 'ui-builder.html', title: 'ONE-X UI Builder' },
-    ];
-
-    for (const section of docSections) {
-        const sectionDir = path.join(docsRoot, section.folder);
-        if (!(await fs.pathExists(sectionDir))) {
-            throw new Error(`Documentation section is missing: ${sectionDir}`);
-        }
-
-        await stageDocumentationImages([path.join(sectionDir, 'img')], outputImagesDir);
-
-        const entries = await fs.readdir(sectionDir, { withFileTypes: true });
-        const chapterPaths = entries
-            .filter((entry) => entry.isFile())
-            .map((entry) => entry.name)
-            .filter((name) => /^\d.*\.md$/i.test(name))
-            .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
-            .map((name) => path.join(sectionDir, name));
-
-        if (!chapterPaths.length) {
-            throw new Error(`No numbered documentation chapters found in ${sectionDir}`);
-        }
-
-        const outputPath = path.join(docOutputDir, section.output);
-        logger.info('Build documentation HTML', {
-            section: section.folder,
-            chapters: chapterPaths.length,
-            outputPath,
-        });
-
-        await sh('pandoc', [
-            ...chapterPaths,
-            '--standalone',
-            '--toc',
-            '--metadata',
-            `title=${section.title}`,
-            '--css',
-            cssFileName,
-            '-o',
-            outputPath,
-        ]);
+    if (!(await fs.pathExists(scriptPath))) {
+        throw new Error(`Documentation build script is missing: ${scriptPath}`);
     }
-}
 
-async function stageDocumentationImages(sourceDirs: string[], outputImagesDir: string) {
-    for (const sourceDir of sourceDirs) {
-        if (!(await fs.pathExists(sourceDir))) {
-            continue;
-        }
+    logger.info('Build ONE-X documentation', { platform, scriptPath });
 
-        await fs.copy(sourceDir, outputImagesDir, { overwrite: true, errorOnExist: false });
+    if (platform === 'win') {
+        await runWindowsPowerShellScript(scriptPath, docsRoot, logger);
+    } else {
+        await sh('zsh', [scriptPath], { cwd: docsRoot });
     }
+
+    if (!(await fs.pathExists(docsOutputRoot))) {
+        throw new Error(`Documentation output directory is missing: ${docsOutputRoot}`);
+    }
+
+    await fs.remove(stagedDocsRoot);
+    await fs.copy(docsOutputRoot, stagedDocsRoot, { overwrite: true, errorOnExist: false });
 }
 
 async function stageArtifacts(
