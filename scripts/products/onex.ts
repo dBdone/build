@@ -334,7 +334,6 @@ async function assembleMacPkgRoot(stageRoot: string, macPkgRoot: string) {
     const onexFolder = path.join(macPkgRoot, 'Applications', 'ONE-X');
     const standaloneTarget = path.join(onexFolder, 'ONE-X-Standalone.app');
     const editorTarget = path.join(onexFolder, 'onex_editor.app');
-    const docsTarget = path.join(onexFolder, 'doc');
     const vst3Target = path.join(macPkgRoot, 'Library', 'Audio', 'Plug-Ins', 'VST3', 'ONE-X.vst3');
     const auTarget = path.join(macPkgRoot, 'Library', 'Audio', 'Plug-Ins', 'Components', 'ONE-X.component');
     const aaxTarget = path.join(macPkgRoot, 'Library', 'Application Support', 'Avid', 'Audio', 'Plug-Ins', 'ONE-X.aaxplugin');
@@ -351,11 +350,6 @@ async function assembleMacPkgRoot(stageRoot: string, macPkgRoot: string) {
     const stagedEditorApp = path.join(stageRoot, 'editor', 'onex_editor.app');
     if (await fs.pathExists(stagedEditorApp)) {
         await fs.copy(stagedEditorApp, editorTarget);
-    }
-
-    const stagedDocs = path.join(stageRoot, 'doc');
-    if (await fs.pathExists(stagedDocs)) {
-        await fs.copy(stagedDocs, docsTarget);
     }
 
     const stagedVst3 = path.join(stageRoot, 'plugins', 'vst3', 'ONE-X.vst3');
