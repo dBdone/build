@@ -8,6 +8,7 @@ import { runManifestStep, OnexReleaseManifest, loadOnexManifest } from '../servi
 import { buildInnoSetup, pkgbuild, validateMacPackageRootNoBundleCollisions } from '../services/installers.js';
 import { signWindowsExecutable } from '../services/codesign_windows.js';
 import { notarizeAndStaple, setupSigningKeychain } from '../services/notarize.js';
+import { uploadToSupabase, upsertInstallerRow } from '../services/supabase.js';
 import { sh } from '../services/exec.js';
 import { requireEnv } from '../utils/env.js';
 
@@ -15,6 +16,7 @@ export interface OnexArgs {
     platform: 'mac' | 'win';
     mode: VersionMode;
     fakeVersion?: string;
+    deploy?: boolean;
     manifestPath: string;
     tagPrefix: string;
     cleanPlayer?: boolean;
@@ -174,6 +176,20 @@ export async function buildOnex(logger: Logger, args: OnexArgs) {
             }],
             ...platformSteps,
         ], logger);
+
+        if (args.deploy) {
+            const installerPath = args.platform === 'mac'
+                ? macPkgOut
+                : path.join(distDir, 'ONE-X Installer.exe');
+            const storageFid = args.platform === 'mac'
+                ? `ONE-X-${version.version}.pkg`
+                : `ONE-X-${version.version}.exe`;
+
+            await pipeline([
+                ['Upload to Supabase', () => uploadToSupabase(installerPath, 'shop/installers', storageFid)],
+                ['Upsert DB row', () => upsertInstallerRow(version.version, PRODUCT_TAG, args.platform, storageFid)],
+            ], logger);
+        }
 
         logger.info('onex build staging completed', {
             platform: args.platform,
@@ -408,6 +424,11 @@ async function buildDocumentation(
     const docsRoot = path.join(nativeRepoRoot, 'documentation');
     const docsOutputRoot = path.join(docsRoot, 'output');
     const stagedDocsRoot = path.join(stageRoot, 'doc');
+    const cloudDocsRoot = fromBuild('..', 'cloud_mika', 'apps', 'account', 'static', 'onex-documentation');
+    const walkthroughAssets = [
+        path.join(docsRoot, '303-walkthrough-assets.zip'),
+        path.join(docsRoot, 'classical-piano-walkthrough-assets.zip'),
+    ];
     const scriptFile = platform === 'win' ? 'build-docs.ps1' : 'build-docs.sh';
     const scriptPath = path.join(docsRoot, scriptFile);
 
@@ -429,6 +450,32 @@ async function buildDocumentation(
 
     if (!(await fs.pathExists(docsOutputRoot))) {
         throw new Error(`Documentation output directory is missing: ${docsOutputRoot}`);
+    }
+
+    logger.info('Sync ONE-X documentation to cloud_mika', {
+        source: docsOutputRoot,
+        target: cloudDocsRoot,
+    });
+
+    await fs.emptyDir(cloudDocsRoot);
+
+    const outputEntries = await fs.readdir(docsOutputRoot);
+    for (const entry of outputEntries) {
+        await fs.copy(path.join(docsOutputRoot, entry), path.join(cloudDocsRoot, entry), {
+            overwrite: true,
+            errorOnExist: false,
+        });
+    }
+
+    for (const assetPath of walkthroughAssets) {
+        if (!(await fs.pathExists(assetPath))) {
+            throw new Error(`Documentation walkthrough asset is missing: ${assetPath}`);
+        }
+
+        await fs.copy(assetPath, path.join(cloudDocsRoot, path.basename(assetPath)), {
+            overwrite: true,
+            errorOnExist: false,
+        });
     }
 
     await fs.remove(stagedDocsRoot);

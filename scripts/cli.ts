@@ -93,6 +93,7 @@ const argv = yargs(hideBin(process.argv))
       .option('platform', { choices: ['mac', 'win'] as const, demandOption: true })
       .option('mode', { choices: ['working', 'latest'] as const, default: 'working' as const })
       .option('fake-version', { type: 'string', default: '9.9.9-9' })
+      .option('deploy', { type: 'boolean', default: false })
       .option('manifest', { type: 'string', default: 'manifests/onex/release.manifest.json' })
       .option('tag-prefix', { type: 'string', default: 'ONEX_V' })
       .option('clean-player', { type: 'boolean', default: false })
@@ -104,6 +105,7 @@ const argv = yargs(hideBin(process.argv))
         platform: args.platform,
         mode: args.mode as 'working' | 'latest',
         fakeVersion: args.fakeVersion,
+        deploy: args.deploy,
         manifestPath: args.manifest,
         tagPrefix: args.tagPrefix,
         cleanPlayer: args.cleanPlayer,
