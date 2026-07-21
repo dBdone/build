@@ -445,7 +445,7 @@ async function buildDocumentation(
     if (platform === 'win') {
         await runWindowsPowerShellScript(scriptPath, docsRoot, logger);
     } else {
-        await sh('zsh', [scriptPath], { cwd: docsRoot });
+        await sh('bash', [scriptPath], { cwd: docsRoot });
     }
 
     if (!(await fs.pathExists(docsOutputRoot))) {
