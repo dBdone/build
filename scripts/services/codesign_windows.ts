@@ -1,5 +1,5 @@
 import { requireEnv } from '../utils/env.js';
-import { sh } from './exec.js';
+import { shWithRetry } from './exec.js';
 
 /**
  * Sign a Windows executable or installer using signtool.
@@ -8,8 +8,10 @@ import { sh } from './exec.js';
 export async function signWindowsExecutable(exePath: string) {
   const signtool = requireEnv('SIGNTOOL_EXE');
   const certThumbprint = requireEnv('WINDOWS_CERT_SHA1');
-  
-  await sh(signtool, [
+
+  // signtool intermittently fails (e.g. timestamp server hiccups); retry a few
+  // times before giving up so a flaky call doesn't force a full rebuild.
+  await shWithRetry(signtool, [
     'sign',
     '/fd', 'sha256',
     '/tr', 'http://ts.ssl.com',

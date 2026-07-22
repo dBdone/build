@@ -1,4 +1,4 @@
-import { sh } from './exec.js';
+import { sh, shWithRetry } from './exec.js';
 import { requireEnv } from '../utils/env.js';
 import { fromBuild } from '../utils/root.js';
 import path from 'node:path';
@@ -77,14 +77,21 @@ export async function signAAXPlugin(options: AAXSigningOptions) {
 
   if (autoinstall) args.push('--autoinstall', 'on');
 
-  await sh(wraptoolExe, args);
+  // On Windows, wraptool shells out to signtool internally, which can fail
+  // with the same spurious/transient errors as direct signtool calls; retry
+  // the whole wraptool invocation rather than forcing a rebuild.
+  if (isWindows) {
+    await shWithRetry(wraptoolExe, args);
+  } else {
+    await sh(wraptoolExe, args);
+  }
 
   await fs.move(tmpOutput, pluginPath, { overwrite: true });
 
   // Verify right away (Windows)
   if (isWindows) {
     const signtool = requireEnv('SIGNTOOL_EXE');
-    await sh(signtool, ['verify', '/pa', '/v', '/tw', path.resolve(pluginPath)]);
+    await shWithRetry(signtool, ['verify', '/pa', '/v', '/tw', path.resolve(pluginPath)]);
   }
 }
 
