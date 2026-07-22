@@ -142,10 +142,7 @@ export async function buildOnex(logger: Logger, args: OnexArgs) {
                     await fs.writeFile(pubspecPath, patched, 'utf-8');
                 }
             }],
-            ['Build documentation', async () => {
-                await buildDocumentation(nativeRepoRoot, stageRoot, logger, args.platform);
-            }],
-            ...platformConfig.buildSteps.map((step) => {
+            ...platformConfig.buildSteps.map((step: typeof platformConfig.buildSteps[number]) => {
                 const resolvedStep = {
                     ...step,
                     cwd: resolveTemplate(step.cwd),
@@ -407,73 +404,6 @@ async function collectDirsRecursively(root: string): Promise<string[]> {
 
 function depth(filePath: string): number {
     return filePath.split(path.sep).length;
-}
-
-async function buildDocumentation(
-    nativeRepoRoot: string,
-    stageRoot: string,
-    logger: Logger,
-    platform: 'mac' | 'win'
-) {
-    const docsRoot = path.join(nativeRepoRoot, 'documentation');
-    const docsOutputRoot = path.join(docsRoot, 'output');
-    const stagedDocsRoot = path.join(stageRoot, 'doc');
-    const cloudDocsRoot = fromBuild('..', 'cloud_mika', 'apps', 'account', 'static', 'onex-documentation');
-    const walkthroughAssets = [
-        path.join(docsRoot, '303-walkthrough-assets.zip'),
-        path.join(docsRoot, 'classical-piano-walkthrough-assets.zip'),
-    ];
-    const scriptFile = platform === 'win' ? 'build-docs.ps1' : 'build-docs.sh';
-    const scriptPath = path.join(docsRoot, scriptFile);
-
-    if (!(await fs.pathExists(docsRoot))) {
-        throw new Error(`Documentation directory does not exist: ${docsRoot}`);
-    }
-
-    if (!(await fs.pathExists(scriptPath))) {
-        throw new Error(`Documentation build script is missing: ${scriptPath}`);
-    }
-
-    logger.info('Build ONE-X documentation', { platform, scriptPath });
-
-    if (platform === 'win') {
-        await runWindowsPowerShellScript(scriptPath, docsRoot, logger);
-    } else {
-        await sh('bash', [scriptPath], { cwd: docsRoot });
-    }
-
-    if (!(await fs.pathExists(docsOutputRoot))) {
-        throw new Error(`Documentation output directory is missing: ${docsOutputRoot}`);
-    }
-
-    logger.info('Sync ONE-X documentation to cloud_mika', {
-        source: docsOutputRoot,
-        target: cloudDocsRoot,
-    });
-
-    await fs.emptyDir(cloudDocsRoot);
-
-    const outputEntries = await fs.readdir(docsOutputRoot);
-    for (const entry of outputEntries) {
-        await fs.copy(path.join(docsOutputRoot, entry), path.join(cloudDocsRoot, entry), {
-            overwrite: true,
-            errorOnExist: false,
-        });
-    }
-
-    for (const assetPath of walkthroughAssets) {
-        if (!(await fs.pathExists(assetPath))) {
-            throw new Error(`Documentation walkthrough asset is missing: ${assetPath}`);
-        }
-
-        await fs.copy(assetPath, path.join(cloudDocsRoot, path.basename(assetPath)), {
-            overwrite: true,
-            errorOnExist: false,
-        });
-    }
-
-    await fs.remove(stagedDocsRoot);
-    await fs.copy(docsOutputRoot, stagedDocsRoot, { overwrite: true, errorOnExist: false });
 }
 
 async function stageArtifacts(
