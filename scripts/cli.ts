@@ -9,6 +9,7 @@ import { buildFeuer } from './products/feuer.js';
 import { buildApp } from './products/app.js';
 import { buildAichords } from './products/aichords.js';
 import { buildOnex } from './products/onex.js';
+import { buildOnexPlayer } from './products/onexplayer.js';
 
 const argv = yargs(hideBin(process.argv))
   .scriptName('build')
@@ -102,6 +103,30 @@ const argv = yargs(hideBin(process.argv))
     , async (args) => {
       const logger = new Logger(!!args.json);
       await buildOnex(logger, {
+        platform: args.platform,
+        mode: args.mode as 'working' | 'latest',
+        fakeVersion: args.fakeVersion,
+        deploy: args.deploy,
+        manifestPath: args.manifest,
+        tagPrefix: args.tagPrefix,
+        cleanPlayer: args.cleanPlayer,
+        skipNotarize: args.skipNotarize,
+      });
+    })
+  .command('onexplayer <action>', 'Build/package/deploy ONE-X Player (plugin-only)', (y) =>
+    y.positional('action', { choices: ['build'] as const })
+      .option('platform', { choices: ['mac', 'win'] as const, demandOption: true })
+      .option('mode', { choices: ['working', 'latest'] as const, default: 'working' as const })
+      .option('fake-version', { type: 'string', default: '9.9.9-9' })
+      .option('deploy', { type: 'boolean', default: false })
+      .option('manifest', { type: 'string', default: 'manifests/onexplayer/release.manifest.json' })
+      .option('tag-prefix', { type: 'string', default: 'ONEX_V' })
+      .option('clean-player', { type: 'boolean', default: false })
+      .option('skip-notarize', { type: 'boolean', default: false })
+      .option('json', { type: 'boolean', default: false })
+    , async (args) => {
+      const logger = new Logger(!!args.json);
+      await buildOnexPlayer(logger, {
         platform: args.platform,
         mode: args.mode as 'working' | 'latest',
         fakeVersion: args.fakeVersion,

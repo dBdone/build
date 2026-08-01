@@ -5,13 +5,19 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import { signWindowsExecutable } from './codesign_windows.js';
 
-export async function buildInnoSetup(issPath: string, version: string, stagingDir: string, sign: boolean = false) {
+export async function buildInnoSetup(
+  issPath: string,
+  version: string,
+  stagingDir: string,
+  sign: boolean = false,
+  termsMdPath?: string
+) {
   const iscc = requireEnv('ISCC_EXE');
   const installerRoot = fromBuild('installer');
   const termsRtf = path.join(installerRoot, 'terms-of-service.rtf');
 
   // Convert terms.md to RTF using pandoc
-  const termsMd = path.join(installerRoot, 'terms.md');
+  const termsMd = termsMdPath ?? path.join(installerRoot, 'terms.md');
   await sh('pandoc', ['-s', '-f', 'gfm', '-t', 'rtf', '-o', termsRtf, termsMd]);
 
   // Read the .iss template
