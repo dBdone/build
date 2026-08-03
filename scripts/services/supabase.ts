@@ -39,11 +39,13 @@ export async function upsertInstallerRow(version: string, productTag: string, pl
 
   const productId = product.id;
 
-  // Check if a row with this version already exists
+  // Check if a row with this version already exists for this product.
+  // Version alone is not unique across products (e.g., ONE-X and ONE-X Player).
   const { data: existing, error: queryError } = await sb
     .from('installers')
     .select('*')
-    .eq('version', version);
+    .eq('version', version)
+    .eq('product_id', productId);
 
   if (queryError) throw queryError;
 
@@ -66,7 +68,8 @@ export async function upsertInstallerRow(version: string, productTag: string, pl
     const { error: updateError } = await sb
       .from('installers')
       .update(updateData)
-      .eq('version', version);
+      .eq('version', version)
+      .eq('product_id', productId);
     
     if (updateError) throw updateError;
   }
