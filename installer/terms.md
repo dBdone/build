@@ -1,4 +1,4 @@
-Last update: 14. January 2026
+Last update: 3. August 2026
 
 ## 1. Scope of application
 
@@ -10,8 +10,7 @@ applied by dBdone UG (haftungsbeschränkt), (hereinafter referred to as
 enhance productivity and communication\] (the "Software" or "App"), and offers
 the Software under a Software-as-a-Service model ("SaaS") and the App for
 download on MacOS and Windows electronic device. dBdone also offers various
-plugins, AI services, cloud storage solutions, and other digital products and
-services.
+plugins, AI services, cloud storage solutions, and other digital products and services, including ONE-X, an ecosystem (plugin and editor) for building and playing virtual instruments (see Section 8A).
 
 **1.3.** The precise system requirements and the full scope of functions of the
 Software are found in the product description on the distribution platform used
@@ -229,6 +228,8 @@ updates
 and Windows Free version with limited samples and functions Full version
 includes 3 TAETRO sample packs and custom sample functionality
 
+**ONE-X** – Ecosystem for building and playing virtual instruments (Beta). **ONE-X plugin:** free DAW plugin/standalone (VST/AU) to load and play Products; no account required to download. **ONE-X editor — Free plan:** free authoring tier for personal, non-commercial use; published Products carry a mandatory "Made with ONE-X" badge and may not be sold. **ONE-X AI:** paid subscription enabling commercial publishing (no "Made with ONE-X" badge) and AI-assisted development (powered by Google Gemini) with AI credits included in the subscription. **ONE-X Full:** paid subscription including everything in AI plus DRM (sample encryption/content protection), direct support, and the private developer community. Products (libraries) are distributed by the Author/Vendor themselves; dBdone hosts only the plugin. Commercial distribution, and new license key activations of Products, require the Author to maintain an active paid subscription; the Author/Vendor is the sole seller toward end users. The editor requires a dBdone account. See Section 8A for full terms.
+
 We reserve the right to update product features and pricing as needed. For
 current pricing details, visit our official pricing page.
 
@@ -252,8 +253,7 @@ requests must be made via email to hello@dbdone.com.
 
 **6.6** License Keys and Registration Tokens
 
-**6.6.1.** Upon purchase of dBdone App, AI Chords plugin, Pentimento plugin, or
-other licensed products, customers receive a unique Registration Token that can
+**6.6.1.** Upon purchase of dBdone App, AI Chords plugin, Pentimento plugin, ONE-X (paid plans), or other licensed products, customers receive a unique Registration Token that can
 be found in their account under "My Products" (/my\_products).
 
 **6.6.2.** Registration Tokens are required to activate and use the purchased
@@ -309,7 +309,7 @@ may limit or restrict access to beta features without notice.
 
 **6.9.** Important Service Communications
 
-**6.9.1.** dBdone uses MailJet to send important service communications and
+**6.9.1.** dBdone sends important service communications and
 updates to all registered users. These communications are essential for the
 proper functioning of your account and services.
 
@@ -319,7 +319,7 @@ service changes, account security alerts, and compliance-related information.
 
 **6.9.3.** While important service communications contain critical information
 necessary for account security and service functionality, users may opt out
-using the unsubscribe link provided in MailJet communications. However, opting
+using the unsubscribe link provided in such communications. However, opting
 out may result in missing critical service information that could affect your
 account or service access.
 
@@ -443,6 +443,76 @@ copyright infringement.
 
 This license applies to all Sound content included with Pentimento, including
 packs created by TAETRO and other collaborating artists.
+
+## 8A. ONE-X (plugin and editor for virtual instruments)
+
+**8A.1 Overview, Roles and Definitions**
+
+ONE-X is dBdone's ecosystem for building and playing sample- and synth-based virtual instruments. It comprises (i) the **ONE-X plugin**, a DAW plugin (VST/AU) or standalone application that loads and plays finished products; (ii) the **ONE-X editor**, a standalone authoring application (sample mapping, real-time Lua scripting, and the UI Builder) used to build instruments; and (iii) dBdone's infrastructure (accounts, licensing and distribution). A finished instrument is packaged for distribution into a **Product** (a folder containing patch, assets and metadata; file type ".oxl").
+
+Three roles apply: **end users** load Products in their DAW and play them; **Authors** (also referred to as **vendors**) build instruments and publish and distribute Products; and **dBdone** supplies the tools (plugin, editor) and the infrastructure. This Section 8A applies in addition to the general provisions of these Terms of Service; in the event of a conflict specifically regarding ONE-X, this Section 8A prevails.
+
+**8A.2 Beta Status**
+
+ONE-X is currently made available as a public Beta. Notwithstanding any other provision, ONE-X (including the plugin, the editor and any AI features) is provided "as is" and "as available", may contain bugs, errors or incomplete features, and may change materially before or after general release. The provisions on Beta Testing Programs (Section 6.8), Warranty (Section 12) and — for the free tiers — Limited Liability for Services Provided Free of Charge (Section 14) apply accordingly. dBdone does not warrant uninterrupted or error-free operation of ONE-X during the Beta phase. Nothing in this Section 8A.2 excludes or limits the mandatory statutory warranty or liability rights of consumers (in particular under §§ 327 et seq. BGB); the "as is" and "as available" provisions apply only to the extent permitted by law.
+
+**8A.3 Account and Access; Local-First Operation**
+
+The editor requires a dBdone account (Section 3). The ONE-X plugin may be downloaded and used to load and play Products, and to activate commercial Products by entering a license key, **without a dBdone account**. A dBdone account — together with an applicable plan and, where relevant, AI credits — is required only for the editor and for AI features (Section 8A.8), which are used by Authors.
+
+ONE-X connects to dBdone's servers to verify accounts, the applicable ONE-X plan or license, license key activations, and the availability of AI credits/tokens. Except for the account, license, activation and AI-feature data described in Section 8A.8 and in the Privacy Policy, ONE-X operates locally: instruments, Products, samples and other content created or imported by the user are stored and managed locally on the user's device and remain under the user's control. dBdone does not upload, access or store the user's samples or Product content.
+
+**8A.4 Plans, Commercial Use and Activation**
+
+ONE-X is offered in several tiers, the current scope and pricing of which are described on the Website:
+
+(a) **ONE-X plugin** — provided free of charge, used to load and play Products (end users);
+
+(b) **ONE-X editor — Free plan** — a free authoring tier allowing Authors to build instruments and publish Products free of charge (non-commercially). Products published under the Free plan may be distributed free of charge but carry a mandatory **"Made with ONE-X" badge** in the user interface, and may not be sold, licensed for a fee, or otherwise commercially distributed;
+
+(c) **ONE-X AI** — a paid subscription that enables commercial publishing of Products (removing the "Made with ONE-X" badge) and adds AI-assisted development features (e.g., zone mapping, script authoring, GUI building) together with AI credits/tokens included with the subscription; and
+
+(d) **ONE-X Full (Pro)** — a paid subscription that includes everything in ONE-X AI and adds professional features, in particular DRM (sample encryption and content protection) for Products, direct support, and access to the private developer community.
+
+Commercial distribution of Products — meaning selling them, licensing them for a fee, or bundling them into a paid product — requires an active, applicable paid subscription (ONE-X AI or ONE-X Full, as set out on the Website).
+
+Commercial Products are activated by end users in the ONE-X plugin by entering a **license key**. Authors generate license keys in any quantity from their ONE-X account and sell them on their own terms (the license keys are distinct from the Registration Tokens in Section 6.6, which apply to the purchase of dBdone's own products). A Product that has been activated on a device can be re-activated on that same device at any time. Activation on a new or different device requires a valid license key from the Author. New license key activations require the Author to maintain an active applicable paid subscription: **if the Author's subscription is cancelled or paused, new license key activations of that Author's Products may no longer be possible.**
+
+The Author (Vendor) is the sole seller of, and sole contracting party for, the Products they distribute or sell to end users; dBdone provides only the ONE-X tools and the activation infrastructure and is not a party to, and not the seller under, the contract between an Author and their end users (Section 8A.6). The Author is solely responsible, toward their end users and the competent authorities, for all obligations arising from such sales — including consumer information and withdrawal rights, invoicing, and the collection and remittance of any applicable taxes (including VAT/OSS); for issuing, managing and, where needed (e.g., on a customer's device change), replacing license keys; and for any refunds or other remedies owed to their end users, including where activation becomes unavailable because the Author's subscription has ended or been paused. The Author shall disclose the applicable activation conditions to their end users and shall indemnify dBdone in accordance with Section 10.
+
+On the ONE-X Full plan, Authors may additionally enable DRM protection for commercial Products: the Product's asset container (samples, wavetables, scripts, UI graphics, MIDI files and other assets) is encrypted, and a user- and machine-specific decryption key is generated when the Product is registered with its license key.
+
+Circumventing the "Made with ONE-X" badge, the plan, license, license key or activation checks, any DRM/encryption, or the AI credit/token limits is prohibited (Section 8A.9).
+
+**8A.5 Ownership of Instruments/Products and of ONE-X**
+
+As between the parties, the Author retains all rights, title and interest in and to the instruments they build and the Products they publish with ONE-X, including their own samples, recordings, scripts, presets, artwork and interface designs, subject to Section 8A.6 and to the Author holding all necessary rights under Section 8A.7.
+
+All rights, title and interest in and to ONE-X itself — including the plugin, the editor, the authoring engine, the runtime, the default user-interface components and controls, the file formats, and any content bundled by dBdone — remain the exclusive property of dBdone and its licensors (Section 11.6). No ownership of, or branding rights to, the ONE-X engine, plugin or runtime transfers to any Author or end user.
+
+dBdone grants the Author a non-exclusive, non-transferable license to use the ONE-X engine and runtime, as provided through the ONE-X plugin, solely to create and run Products, in accordance with the Author's applicable plan. The ONE-X engine and runtime are proprietary to dBdone and are not distributed by, or contained in the Products of, the Author; end users obtain the runtime only as part of the ONE-X plugin supplied by dBdone (Section 8A.6). Products contain only data (patch, assets and metadata) played back by the ONE-X plugin.
+
+**8A.6 The ONE-X plugin; Distribution and End Users**
+
+The ONE-X plugin is licensed by dBdone directly to each end user under these Terms of Service, on a free, non-exclusive and non-transferable basis, solely to load and play Products. **The ONE-X plugin is distributed exclusively by dBdone (via dBdone's website); end users obtain the plugin from dBdone and do not require a dBdone account to download and use it for playback.** Authors and third parties may not host, bundle, redistribute, resell, rebrand or modify the ONE-X plugin, engine or runtime, and may not represent them as their own, **unless expressly authorized in writing by dBdone.**
+
+Products are distributed by the Author themselves — for example, via the Author's own website; dBdone does not host or distribute Authors' Products. Installing a Product is a copy operation: the end user places the Product folder into a library folder they have configured in the plugin (directories the plugin scans for installed Products, typically on a dedicated drive), and the plugin detects the Product on the next rescan and displays it. Free Products can be used directly. For commercial Products, the end user activates the Product once via a "Register" step by entering the license key provided by the Author, after which the Product is unlocked (Section 8A.4).
+
+**8A.7 Samples and Content within Products; Warranties**
+
+Authors are solely responsible for all samples, recordings, images, scripts, text and other content they include in, or distribute with, their Products ("Product Content"). The Author represents and warrants that they own, or have obtained, all rights, licenses and permissions necessary to use, reproduce, embed and distribute the Product Content, and that the Product Content does not infringe any third-party rights or violate any applicable law. dBdone does not review, monitor or control Product Content, acquires no rights in it beyond what is necessary to provide ONE-X, and is not responsible for it. The indemnification obligations in Section 10 and the content restrictions in Section 9.2 apply to Product Content accordingly. Any sample content that dBdone itself bundles with ONE-X is licensed under terms comparable to Section 8 (Sound Content License) and/or as stated on the Website. Section 7.2 does not apply to locally stored instruments, Products or Product Content, which are never uploaded to dBdone.
+
+**8A.8 AI Features**
+
+ONE-X may offer AI-assisted features (for example, AI-assisted mapping of local sample folders, referred to as "zone mapping"). These features are powered by **Google Gemini** as our AI service provider, consume the AI credits/tokens included with the applicable ONE-X subscription (which are separate from the purchasable AI Credits Packs in Section 6.5, applicable to AI Chords), and require an applicable paid plan. To perform these features, ONE-X transmits to dBdone and/or Google only the metadata necessary for the feature — in particular the relative directory and file names, and file-naming patterns, within the project folder the user selects. **Absolute paths, user account names and device names are not transmitted, and audio and sample content itself is never uploaded or transmitted.** Further details are set out in the Privacy Policy. AI outputs are generated automatically and are provided without warranty as to their accuracy, completeness or fitness for a particular purpose, to the extent permitted by law (Sections 12–14); this does not exclude or limit mandatory statutory consumer rights.
+
+**8A.9 Restrictions**
+
+In addition to Sections 9 and 11.4, users must not: (i) reverse engineer, decompile, disassemble or attempt to derive the source code or algorithms of the ONE-X engine, plugin or runtime, except to the extent such acts are expressly permitted by mandatory statutory law (in particular § 69e UrhG / Art. 6 EU Software Directive); (ii) circumvent, disable or interfere with the account, plan, license, license key or activation verification, the "Made with ONE-X" badge, any DRM or encryption applied to Products, or the AI credit/token limits; (iii) use the Free plan to publish Products that are then sold or commercially distributed without an applicable paid subscription; or (iv) host, distribute, sublicense or otherwise make available the ONE-X engine, plugin or runtime as a standalone product or as part of any competing authoring or playback product, except as expressly authorized in writing by dBdone.
+
+**8A.10 Suspension and Termination**
+
+Without prejudice to Section 16, dBdone may suspend or terminate a user's access to ONE-X, or to specific ONE-X features, in the event of a breach of this Section 8A. Termination or pausing of a paid ONE-X subscription affects commercial-distribution and activation rights as set out in Section 8A.4, but does not, by itself, revoke end users' licenses to use Products they have already lawfully activated.
 
 ## 9. Content Restrictions
 
@@ -821,7 +891,7 @@ a consumer dispute settlement commission nor will do so voluntarily.
 undisputed by dBdone or have been legally established.
 
 **19.3.** The exclusive place of jurisdiction for all disputes arising from and
-in connection with this Agreement is Berlin if the Customer is a Business
+in connection with this Agreement is Munich if the Customer is a Business
 Customer. The place of performance is the registered office of dBdone.
 
 **19.3.1.** For consumers, disputes may be resolved through the competent courts
