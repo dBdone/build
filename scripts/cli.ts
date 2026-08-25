@@ -6,6 +6,7 @@ import { Logger } from './utils/logger.js';
 import { buildPentimento } from './products/pentimento.js';
 import { buildGlas } from './products/glas.js';
 import { buildFeuer } from './products/feuer.js';
+import { buildWasser } from './products/wasser.js';
 import { buildApp } from './products/app.js';
 import { buildAichords } from './products/aichords.js';
 import { buildOnex } from './products/onex.js';
@@ -55,6 +56,21 @@ const argv = yargs(hideBin(process.argv))
     , async (args) => {
       const logger = new Logger(!!args.json);
       await buildFeuer(logger, {
+        platform: args.platform, mode: args.mode as 'working' | 'latest', fakeVersion: args.fakeVersion,
+        deploy: args.deploy, skipNotarize: args.skipNotarize
+      });
+    })
+  .command('wasser <action>', 'Build/package/deploy Wasser', (y) =>
+    y.positional('action', { choices: ['build'] as const })
+      .option('platform', { choices: ['mac', 'win'] as const, demandOption: true })
+      .option('mode', { choices: ['working', 'latest'] as const, default: 'working' as const })
+      .option('fake-version', { type: 'string', default: '9.9.9-9' })
+      .option('deploy', { type: 'boolean', default: false })
+      .option('skip-notarize', { type: 'boolean', default: false })
+      .option('json', { type: 'boolean', default: false })
+    , async (args) => {
+      const logger = new Logger(!!args.json);
+      await buildWasser(logger, {
         platform: args.platform, mode: args.mode as 'working' | 'latest', fakeVersion: args.fakeVersion,
         deploy: args.deploy, skipNotarize: args.skipNotarize
       });

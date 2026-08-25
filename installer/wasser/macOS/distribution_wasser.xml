@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>Wasser Version 9.9.9+99</title>
+    <license file="terms-of-service.html"/>
+
+    <pkg-ref id="com.dbdone.wasservst.pkg" version="0" onConclusion="none">wasserVST.pkg</pkg-ref>
+    <pkg-ref id="com.dbdone.wasserau.pkg" version="0" onConclusion="none">wasserAU.pkg</pkg-ref>
+    <pkg-ref id="com.dbdone.wasseraax.pkg" version="0" onConclusion="none">wasserAAX.pkg</pkg-ref>
+
+    <pkg-ref id="com.dbdone.wasserpresets.pkg" version="0" onConclusion="none">wasserPRESETS.pkg</pkg-ref>
+
+    <options customize="always" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <choices-outline>
+        <line choice="wasserpresets"/>
+        <line choice="wasservst"/>
+        <line choice="wasserau"/>
+        <line choice="wasseraax"/>
+    </choices-outline>
+
+    <choice id="wasserpresets"
+        title="Presets (required)"
+        selected="true"
+        enabled="false"
+        visible="false">
+        <pkg-ref id="com.dbdone.wasserpresets.pkg"/>
+    </choice>
+
+    <choice id="wasservst" title="Wasser Plugin (VST3)" visible="true">
+        <pkg-ref id="com.dbdone.wasservst.pkg"/>
+    </choice>
+    <choice id="wasserau" title="Wasser Plugin (AU)" visible="true">
+        <pkg-ref id="com.dbdone.wasserau.pkg"/>
+    </choice>
+    <choice id="wasseraax" title="Wasser Plugin (AAX)" visible="true">
+        <pkg-ref id="com.dbdone.wasseraax.pkg"/>
+    </choice>
+</installer-gui-script>
