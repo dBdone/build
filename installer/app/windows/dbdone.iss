@@ -29,6 +29,15 @@ Source: "..\..\..\..\native\components\dbDoneBackend\Builds\VisualStudio2022\x64
 ;[UninstallDelete]
 ;Type: filesandordirs; Name: "{userappdata}\com.dbdone"
 
+[Registry]
+; dbdone://activate links from "My products" (cloud_mika docs/APP-INTEGRATION.md).
+; Per machine, so the uninstaller removes it (uninsdeletekey); the app only writes
+; its own per-user key when this one is missing (dev / unpacked builds).
+Root: HKLM; Subkey: "Software\Classes\dbdone"; ValueType: string; ValueName: ""; ValueData: "URL:dBdone"; Flags: uninsdeletekey; Components: main
+Root: HKLM; Subkey: "Software\Classes\dbdone"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""; Components: main
+Root: HKLM; Subkey: "Software\Classes\dbdone\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: """{app}\dBdone.exe"",0"; Components: main
+Root: HKLM; Subkey: "Software\Classes\dbdone\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\dBdone.exe"" ""%1"""; Components: main
+
 [Components]
 Name: "main"; Description: "dbDone App"; Types: full custom compact; Flags: fixed
 Name: "plugins"; Description: "Plugins"; Types: full
