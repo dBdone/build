@@ -3,6 +3,17 @@
 
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
 
+; Source checkouts, relative to this folder; override with
+;   ISCC /DAppRoot=..\..\..\..\native\app dbdone.iss
+; App 1.5 is built in the ux-2026-demo worktree (cloud_mika docs/APP-INTEGRATION.md);
+; plugins and the backend library still come from the main checkout.
+#ifndef AppRoot
+  #define AppRoot "..\..\..\..\native-ux-2026-demo\app"
+#endif
+#ifndef NativeRoot
+  #define NativeRoot "..\..\..\..\native"
+#endif
+
 [Setup]
 ArchitecturesInstallIn64BitMode=x64compatible 
 ArchitecturesAllowed=x64compatible 
@@ -20,10 +31,10 @@ LicenseFile="..\..\..\installer\terms-of-service.rtf"
 
 [Files]
 Source: "..\..\..\installer\VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall; Components: main
-Source: "..\..\..\..\native\app\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Components: main
-Source: "..\..\..\..\native\plugins\dbdone\Builds\VisualStudio2022\x64\Release\VST3\dbdone.vst3\*"; DestDir: "{commoncf}\VST3\dbdone.vst3"; Flags: ignoreversion recursesubdirs; Components: plugins\dbdoneVST
-Source: "..\..\..\..\native\plugins\dbdone\Builds\VisualStudio2022\x64\Release\AAX\dbdone.aaxplugin\*"; DestDir: "{commoncf}\Avid\Audio\Plug-Ins\dbdone.aaxplugin"; Flags: ignoreversion recursesubdirs; Components: plugins\dbdoneAAX
-Source: "..\..\..\..\native\components\dbDoneBackend\Builds\VisualStudio2022\x64\Release\Dynamic Library\dbdone_backend.dll"; DestDir: "{commonappdata}\dBdone\dbdone-app"; Flags: ignoreversion
+Source: "{#AppRoot}\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs; Components: main
+Source: "{#NativeRoot}\plugins\dbdone\Builds\VisualStudio2022\x64\Release\VST3\dbdone.vst3\*"; DestDir: "{commoncf}\VST3\dbdone.vst3"; Flags: ignoreversion recursesubdirs; Components: plugins\dbdoneVST
+Source: "{#NativeRoot}\plugins\dbdone\Builds\VisualStudio2022\x64\Release\AAX\dbdone.aaxplugin\*"; DestDir: "{commoncf}\Avid\Audio\Plug-Ins\dbdone.aaxplugin"; Flags: ignoreversion recursesubdirs; Components: plugins\dbdoneAAX
+Source: "{#NativeRoot}\components\dbDoneBackend\Builds\VisualStudio2022\x64\Release\Dynamic Library\dbdone_backend.dll"; DestDir: "{commonappdata}\dBdone\dbdone-app"; Flags: ignoreversion
 
 ;will produce warnings, since installation is system-wide and deinstall requires per-user mode
 ;[UninstallDelete]
