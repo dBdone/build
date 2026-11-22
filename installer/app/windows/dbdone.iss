@@ -5,13 +5,13 @@
 
 ; Source checkouts, relative to this folder; override with
 ;   ISCC /DAppRoot=..\..\..\..\native\app dbdone.iss
-; App 1.5 is built in the ux-2026-demo worktree (cloud_mika docs/APP-INTEGRATION.md);
-; plugins and the backend library still come from the main checkout.
+; App 1.5 (app, plugin and backend library) is built in the ux-2026-demo worktree
+; (cloud_mika docs/APP-INTEGRATION.md); build it with NATIVE_ROOT set to that folder.
 #ifndef AppRoot
   #define AppRoot "..\..\..\..\native-ux-2026-demo\app"
 #endif
 #ifndef NativeRoot
-  #define NativeRoot "..\..\..\..\native"
+  #define NativeRoot "..\..\..\..\native-ux-2026-demo"
 #endif
 
 [Setup]
