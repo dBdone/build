@@ -11,7 +11,7 @@ import { productbuild, buildInnoSetup, prepareMacInstallerResources, buildMacPac
 import { notarizeAndStaple, setupSigningKeychain } from '../services/notarize.js';
 import { uploadToSupabase, upsertInstallerRow } from '../services/supabase.js';
 import { buildBackendLib } from '../services/backendlib.js';
-import { signAAXPlugin, removeInstalledAAXPlugin } from '../services/aax_signing.js';
+import { signAAXPlugin, removeInstalledAAXPlugin, ensurePaceLicenseDRunning } from '../services/aax_signing.js';
 import { signWindowsExecutable } from '../services/codesign_windows.js';
 import { sh } from '../services/exec.js';
 
@@ -44,6 +44,11 @@ const paths = {
 };
 
 export async function buildAichords(logger: Logger, args: AichordsArgs) {
+  // Fail fast if the AAX signing service is missing, before the long build
+  if (args.platform === 'mac') {
+    await runTask('Check PACE LicenseD', () => ensurePaceLicenseDRunning(), { logger });
+  }
+
   await fs.emptyDir(paths.dist);
 
   const version: VersionInfo = await computeVersion(args.mode, args.fakeVersion ?? '9.9.9-9', 'AICHORDS_V');

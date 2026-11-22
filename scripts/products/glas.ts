@@ -11,7 +11,7 @@ import { productbuild, buildInnoSetup, prepareMacInstallerResources, buildMacPac
 import { notarizeAndStaple, setupSigningKeychain } from '../services/notarize.js';
 import { uploadToSupabase, upsertInstallerRow } from '../services/supabase.js';
 import { buildBackendLib } from '../services/backendlib.js';
-import { signAAXPlugin, removeInstalledAAXPlugin } from '../services/aax_signing.js';
+import { signAAXPlugin, removeInstalledAAXPlugin, ensurePaceLicenseDRunning } from '../services/aax_signing.js';
 import { signWindowsExecutable } from '../services/codesign_windows.js';
 import { sh } from '../services/exec.js';
 
@@ -45,6 +45,11 @@ const paths = {
 };
 
 export async function buildGlas(logger: Logger, args: GlasArgs) {
+    // Fail fast if the AAX signing service is missing, before the long build
+    if (args.platform === 'mac') {
+        await runTask('Check PACE LicenseD', () => ensurePaceLicenseDRunning(), { logger });
+    }
+
     // Clear and ensure dist directory for clean build
     await fs.emptyDir(paths.dist);
 

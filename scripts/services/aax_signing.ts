@@ -4,6 +4,22 @@ import { fromBuild } from '../utils/root.js';
 import path from 'node:path';
 import fs from 'fs-extra';
 
+const PACE_LICENSED_SERVICE = 'com.paceap.eden.licensed';
+
+// wraptool signs the AAX through PACE's LicenseD, late in the build.
+// Check it up front so a missing service fails in seconds, not after the whole build.
+export async function ensurePaceLicenseDRunning() {
+  if (process.platform !== 'darwin') return;
+  const { execa } = await import('execa');
+  const result = await execa('launchctl', ['print', `system/${PACE_LICENSED_SERVICE}`], { reject: false });
+  if (result.failed) {
+    throw new Error(
+      `PACE LicenseD is not loaded, so wraptool can't sign the AAX. Load it with:\n` +
+      `  sudo launchctl bootstrap system /Library/LaunchDaemons/${PACE_LICENSED_SERVICE}.plist`,
+    );
+  }
+}
+
 // Remove existing AAX plugin from system directory (requires sudo on macOS)
 export async function removeInstalledAAXPlugin(pluginName: string) {
   const aaxSystemPath = `/Library/Application Support/Avid/Audio/Plug-Ins/${pluginName}.aaxplugin`;
